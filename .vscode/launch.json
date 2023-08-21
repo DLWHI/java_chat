@@ -14,14 +14,14 @@
             "type": "java",
             "name": "Client",
             "request": "launch",
-            "mainClass": "edu.school21.client.app.Main",
+            "mainClass": "com.dlwhi.client.app.Main",
             "projectName": "client"
         },
         {
             "type": "java",
             "name": "Server",
             "request": "launch",
-            "mainClass": "edu.school21.server.app.Main",
+            "mainClass": "com.dlwhi.server.app.Main",
             "projectName": "server"
         }
     ]
