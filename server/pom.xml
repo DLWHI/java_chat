@@ -56,6 +56,16 @@
       <artifactId>HikariCP</artifactId>
       <version>4.0.3</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.6.4</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -108,11 +118,11 @@
     </pluginManagement>
     <resources>
       <resource>
-        <targetPath>${basedir}/config</targetPath>
+        <targetPath>config</targetPath>
         <directory>src/main/config</directory>
       </resource>
       <resource>
-        <targetPath>${basedir}/resources</targetPath>
+        <targetPath>resources</targetPath>
         <directory>src/main/resources</directory>
       </resource>
     </resources>

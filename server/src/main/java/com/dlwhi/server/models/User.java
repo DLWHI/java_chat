@@ -44,8 +44,6 @@ public class User {
         return created;
     }
 
-    public JdbcTemplate
-
     public long getID() {
         return id;
     }

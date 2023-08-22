@@ -1,15 +1,17 @@
 package com.dlwhi.client.app;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.TreeMap;
+import java.util.function.Function;
 
 import com.dlwhi.client.menu.Menu;
 
+// TODO add invocation type checks
 public class App {
     public enum Command {
         SIGN_IN,
@@ -17,24 +19,37 @@ public class App {
         EXIT;
     }
 
+    private String hostname;
+    private int port;
+
     private final PrintStream out = System.out;
     private final Scanner in = new Scanner(System.in);
 
     private boolean exited = false;
 
-    private Map<String, Menu> contexts = new TreeMap<>();
+    private Map<String, Menu> contexts = new HashMap<>();
     private Menu currentContext;
 
-    public int exec() {
-        while (!exited) {
-            try {
+    public App(String hostname, int port) {
+        this.hostname = hostname;
+        this.port = port;
+    }
+
+    public int exec() throws IOException {
+        try (Connection conn = new Connection(hostname, port)) {
+            out.println(conn.probe());
+            while (!exited) {
                 currentContext.display(out);
                 out.println("---------------------");
                 out.print("-> ");
-                call(currentContext.dispatchInput(in));
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
+                call(currentContext.dispatchInput(in), conn);
             }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
         return 0;
     }
@@ -56,39 +71,28 @@ public class App {
         contexts.put(name, context);
     }
 
-    private void call(Command cmd)
+    private void call(Command cmd, Connection target)
             throws IllegalAccessException,
             IllegalArgumentException,
             InvocationTargetException {
-        for (Method method : getClass().getDeclaredMethods()) {
+        for (Method method : target.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Binded.class)) {
                 Binded bind = method.getAnnotation(Binded.class);
                 // add compile time parameter checks
                 if (bind.command() == cmd) {
-                    method.invoke(this, collectParameters(
-                                    bind.parameterNames(),
-                                    method.getParameterTypes()));
+                    method.invoke(target, collectParameters(
+                            bind.parameterNames()));
                 }
             }
         }
     }
 
-    private Object[] collectParameters(String[] paramNames, Class<?>... paramTypes) {
+    private Object[] collectParameters(String[] paramNames) {
         Object[] params = new Object[paramNames.length];
         for (int i = 0; i < params.length; i++) {
             System.out.println("Enter " + paramNames[i]);
             params[i] = in.nextLine();
         }
         return params;
-    }
-
-    @Binded(command = Command.SIGN_IN, parameterNames = { "username", "password" })
-    private void signIn(String username, String passwd) {
-
-    }
-
-    @Binded(command = Command.SIGN_UP, parameterNames = { "username", "password" })
-    private void signUp(String username, String passwd) {
-
     }
 }

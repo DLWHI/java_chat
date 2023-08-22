@@ -1,20 +1,25 @@
 package com.dlwhi.server.config;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 
 import com.dlwhi.server.repositories.IUserRepository;
 import com.dlwhi.server.repositories.UserRepository;
+import com.dlwhi.server.server.Server;
 import com.dlwhi.server.services.ChatService;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@PropertySource("classpath:config/db.properties")
-public class ChatServerBuilder {
+@PropertySource("classpath:config/com/dlwhi/db.cfg")
+@Import(Server.class)
+public class ServerConfig {
     @Value("${db.url}")
     private String dbUrl;
     @Value("${db.user}")
@@ -23,6 +28,15 @@ public class ChatServerBuilder {
     private String dbPasswd;
     @Value("${db.driver.name}")
     private String dbDriver;
+
+    @Autowired
+    @Qualifier("server")
+    private Server server;
+
+    @Bean
+    public Server serverInstance() {
+        return server;
+    }
 
     @Bean
     public DataSource dataSourceHikari() {

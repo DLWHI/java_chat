@@ -14,15 +14,26 @@
             "type": "java",
             "name": "Client",
             "request": "launch",
-            "mainClass": "com.dlwhi.client.app.Main",
-            "projectName": "client"
+            "mainClass": "com.dlwhi.client.app.MainClient",
+            "projectName": "client",
+            "args": [
+                "--hostname=localhost",
+                "--port=9857"
+            ]
         },
         {
             "type": "java",
             "name": "Server",
             "request": "launch",
-            "mainClass": "com.dlwhi.server.app.Main",
+            "mainClass": "com.dlwhi.server.app.MainServer",
             "projectName": "server"
         }
-    ]
+    ],
+    "compounds": [
+        {
+          "name": "THE SHARMANKA",
+          "configurations": ["Server", "Client"],
+          "stopAll": true
+        }
+      ]
 }

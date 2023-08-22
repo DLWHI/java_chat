@@ -1,9 +1,12 @@
 package com.dlwhi.client.config;
 
+import java.util.Map;
 import java.util.Scanner;
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,42 +18,36 @@ import com.dlwhi.client.menu.Menu;
 @Configuration
 @ComponentScan(basePackages = "com.dlwhi.client.menu")
 public class ClientConfig {
-    @Autowired
-    @Qualifier("loginMenu")
-    private Menu login;
+    private final String configFile = "/config/com/dlwhi/commands.cfg";
 
     @Autowired
-    @Qualifier("mainMenu")
-    private Menu main;
+    private Map<String, Menu> menus;
+
+    @Value("${hostname:localhost}")
+    private String hostname;
+    @Value("${port:9857}")
+    private int port;
 
     @Bean
     public App configure() {
-        App app = new App();
+        App app = new App(hostname, port);
         configureBindings();
-        app.addContext("login", login);
+        app.addContext("login", menus.get("login"));
         app.setActiveContext("login");
         return app;
     }
 
+    // TODO remove switch case mechanism in favor of maps
     private void configureBindings() {
         try (Scanner parser = new Scanner(
-                getClass()
-                        .getResourceAsStream("/config/com/dlwhi/bindings.cfg"))) {
+                getClass().getResourceAsStream(configFile))) {
             while (parser.hasNextLine()) {
                 try {
                     String[] bind = parser.nextLine().split("\\.|=");
-                    switch (bind[0]) {
-                        case "login":
-                            login.addCommand(bind[2], Command.valueOf(bind[1].toUpperCase()));
-                        case "main":
-                            main.addCommand(bind[2], Command.valueOf(bind[1].toUpperCase()));
-                    }
+                    menus.get(bind[0]).addCommand(bind[2], Command.valueOf(bind[1].toUpperCase()));
                 } catch (ArrayIndexOutOfBoundsException e) {
-
                 }
             }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
         }
     }
 }

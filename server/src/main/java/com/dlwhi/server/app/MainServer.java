@@ -1,18 +1,19 @@
-package com.dlwhi.client.app;
+package com.dlwhi.server.app;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.dlwhi.client.config.ClientConfig;
+import com.dlwhi.server.config.ServerConfig;
+import com.dlwhi.server.server.Server;
 
-public class Main 
+public class MainServer 
 {
     public static void main( String[] args )
     {
         try (AnnotationConfigApplicationContext ctx = 
-                new AnnotationConfigApplicationContext(ClientConfig.class)) {
+                new AnnotationConfigApplicationContext(ServerConfig.class)) {
             ctx.registerShutdownHook();
-            App app = ctx.getBean("configure", App.class);
-            app.exec();
+            Server server = ctx.getBean("serverInstance", Server.class);
+            server.exec();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

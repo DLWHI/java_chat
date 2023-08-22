@@ -3,14 +3,13 @@ package com.dlwhi.client.menu;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.TreeMap;
-
+import java.util.HashMap;
 import org.springframework.stereotype.Component;
 
 import com.dlwhi.client.app.App.Command;
 import com.dlwhi.client.exceptions.InvalidCommandException;
 
-@Component("mainMenu")
+@Component("main")
 public class MainMenu implements Menu {
     private static final String text =
         "1. Enter a room%n" +
@@ -18,7 +17,7 @@ public class MainMenu implements Menu {
         "3. Logout%n" +
         "4. Exit%n";
 
-    private Map<String, Command> commands = new TreeMap<>();
+    private Map<String, Command> commands = new HashMap<>();
 
     @Override
     public void display(PrintStream out) {
