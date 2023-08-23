@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import com.dlwhi.client.app.App.Command;
 import com.dlwhi.client.json.JSONArgument;
 import com.dlwhi.client.json.JSONCommand;
 
@@ -37,27 +36,9 @@ public class Connection implements Closeable {
         return in.readLine();
     }
 
-    private void send(String packet) throws IOException {
+    public void send(String packet) throws IOException {
         out.write(packet + "\n");
         out.flush();
-    }
-
-    // TODO map methods to commands
-    @Binded(command = Command.SIGN_IN, parameterNames = { "username", "password" })
-    public void signIn(String username, String passwd) {
-        try {
-            JSONCommand toSend = new JSONCommand(Command.SIGN_IN);
-            toSend.addArgument(new JSONArgument("username", username)).addArgument(new JSONArgument("password", passwd));
-            send(toSend.toString());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    @Binded(command = Command.SIGN_UP, parameterNames = { "username", "password" })
-    public void signUp(String username, String passwd) {
-
     }
 
     @Override

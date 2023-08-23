@@ -7,17 +7,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.function.Function;
 
 import com.dlwhi.client.menu.Menu;
 
 // TODO add invocation type checks
 public class App {
-    public enum Command {
-        SIGN_IN,
-        SIGN_UP,
-        EXIT;
-    }
 
     private String hostname;
     private int port;
@@ -54,7 +48,7 @@ public class App {
         return 0;
     }
 
-    @Binded(command = Command.EXIT)
+    @Binded(command = "exit")
     private void exit() {
         exited = true;
     }
@@ -71,7 +65,7 @@ public class App {
         contexts.put(name, context);
     }
 
-    private void call(Command cmd, Connection target)
+    private void call(String cmd, Connection target)
             throws IllegalAccessException,
             IllegalArgumentException,
             InvocationTargetException {

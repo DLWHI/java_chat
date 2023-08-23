@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import com.dlwhi.client.app.App;
-import com.dlwhi.client.app.App.Command;
 import com.dlwhi.client.menu.Menu;
 
 @Configuration
@@ -44,7 +43,7 @@ public class ClientConfig {
             while (parser.hasNextLine()) {
                 try {
                     String[] bind = parser.nextLine().split("\\.|=");
-                    menus.get(bind[0]).addCommand(bind[2], Command.valueOf(bind[1].toUpperCase()));
+                    menus.get(bind[0]).addCommand(bind[2], bind[1]);
                 } catch (ArrayIndexOutOfBoundsException e) {
                 }
             }

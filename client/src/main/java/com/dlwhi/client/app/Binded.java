@@ -5,13 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.dlwhi.client.app.App.Command;
-
 // TODO add compile time argument checking for binds
 // TODO or find a way to remove binds
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Binded {
-    Command command();
+    String command();
     String[] parameterNames() default {};
 }
