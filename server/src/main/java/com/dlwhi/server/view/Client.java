@@ -1,4 +1,4 @@
-package com.dlwhi.server.server;
+package com.dlwhi.server.view;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -8,12 +8,21 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class Connection extends Thread implements Closeable {
+import com.dlwhi.server.models.User;
+import com.dlwhi.server.services.ChatService;
+import com.dlwhi.server.services.UserService;
+
+public class Client extends Thread implements Closeable {
     private final Socket connection;
     private final BufferedReader in;
     private final BufferedWriter out;
 
-    public Connection(Socket connection) throws IOException {
+    private final ChatService service;
+
+    private User user;
+
+    public Client(Socket connection, ChatService service) throws IOException {
+        this.service = service;
         this.connection = connection;
         in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));

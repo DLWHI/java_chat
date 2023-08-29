@@ -1,4 +1,4 @@
-package com.dlwhi.client.menu;
+package com.dlwhi.client.view;
 
 import java.io.PrintStream;
 import java.util.Map;

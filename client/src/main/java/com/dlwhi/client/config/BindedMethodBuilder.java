@@ -12,7 +12,7 @@ import javax.lang.model.element.TypeElement;
 
 import com.google.auto.service.AutoService;
 
-@SupportedAnnotationTypes("com.dlwhi.app.Binded")
+@SupportedAnnotationTypes("com.dlwhi.client.model")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
 public class BindedMethodBuilder extends AbstractProcessor {

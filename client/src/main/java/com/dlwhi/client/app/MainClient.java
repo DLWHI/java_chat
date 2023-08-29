@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
-import com.dlwhi.client.config.ClientConfig;
-
 public class MainClient 
 {
     public static void main( String[] args )
@@ -19,7 +17,7 @@ public class MainClient
             ctx.getEnvironment().getPropertySources().addFirst(cmdOpt);
             ctx.scan("com.dlwhi.client.config");
             ctx.refresh();
-            App app = ctx.getBean("configure", App.class);
+            App app = ctx.getBean("controller", App.class);
             app.exec();
         } catch (IOException e) {
             System.out.println("Unexpected IOException occured:");

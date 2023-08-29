@@ -1,4 +1,4 @@
-package com.dlwhi.client.app;
+package com.dlwhi.client.model;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

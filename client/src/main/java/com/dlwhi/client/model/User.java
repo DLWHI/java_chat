@@ -1,4 +1,4 @@
-package com.dlwhi.client.app;
+package com.dlwhi.client.model;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -8,14 +8,10 @@ import com.dlwhi.client.json.JSONArgument;
 import com.dlwhi.client.json.JSONCommand;
 
 public class User {
-    private Connection conn;
+    private final Connection conn;
     private Map<String, Method> commands;
 
-    public User() {
-
-    }
-
-    public void setConnection(Connection conn) {
+    public User(Connection conn) {
         this.conn = conn;
     }
 

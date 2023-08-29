@@ -3,9 +3,18 @@ package com.dlwhi.server.models;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
 import com.dlwhi.server.exceptions.MismatchedColumnsException;
 
+@PropertySource("classpath:config/com/dlwhi/db.cfg")
 public class User {
+    @Value("${user.table}")
+    private final String tableName = null;
+    
     private long id;
     private String username;
     private String password;
@@ -44,15 +53,19 @@ public class User {
         return created;
     }
 
-    public long getID() {
-        return id;
+    public SqlParameterSource getParamSource() {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue(tableName + ".id", id);
+        params.addValue(tableName + ".un", username);
+        params.addValue(tableName + ".passwd", password);
+        return params;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getPassword() {
-        return password;
+    public boolean passwdMatches(String passwd) {
+        return passwd.equals(password);
     }
 }

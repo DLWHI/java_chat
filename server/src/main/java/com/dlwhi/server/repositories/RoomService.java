@@ -2,6 +2,6 @@ package com.dlwhi.server.repositories;
 
 import com.dlwhi.server.models.Room;
 
-public interface IRoomService extends ICrudRepository<Room> {
+public interface RoomService extends CrudRepository<Room> {
     Room findByName(String name);
 }

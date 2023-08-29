@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JSONCommand {
-    private Command cmd;
+    private String cmd;
     private List<JSONArgument> args = new LinkedList<>();
     
-    public JSONCommand(Command cmd) {
+    public JSONCommand(String cmd) {
         this.cmd = cmd;
     }
 
@@ -22,7 +22,7 @@ public class JSONCommand {
 
     @Override
     public String toString() {
-        String json = "{command:" + cmd.toString();
+        String json = "{command:" + cmd;
         for (JSONArgument jsonArgument : args) {
             json += "," + jsonArgument.toString();
         }

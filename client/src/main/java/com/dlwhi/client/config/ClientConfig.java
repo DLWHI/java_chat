@@ -3,37 +3,37 @@ package com.dlwhi.client.config;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import com.dlwhi.client.app.App;
-import com.dlwhi.client.menu.Menu;
+import com.dlwhi.client.view.ConsoleView;
+import com.dlwhi.client.view.Menu;
+import com.dlwhi.client.view.View;
 
 @Configuration
-@ComponentScan(basePackages = "com.dlwhi.client.menu")
+@ComponentScan(basePackages = "com.dlwhi.client.view")
 public class ClientConfig {
     private final String configFile = "/config/com/dlwhi/commands.cfg";
 
     @Autowired
     private Map<String, Menu> menus;
 
-    @Value("${hostname:localhost}")
-    private String hostname;
-    @Value("${port:9857}")
-    private int port;
-
+    
     @Bean
-    public App configure() {
-        App app = new App(hostname, port);
+    public View console() {
+        View view = new ConsoleView();
         configureBindings();
-        app.addContext("login", menus.get("login"));
-        app.setActiveContext("login");
-        return app;
+        view.addContext("login", menus.get("login"));
+        view.setActiveContext("login");
+        return view;
+    }
+    
+    @Bean
+    public App controller() {
+        return new App(console());
     }
 
     // TODO remove switch case mechanism in favor of maps

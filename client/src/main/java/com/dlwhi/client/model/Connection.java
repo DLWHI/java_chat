@@ -1,4 +1,4 @@
-package com.dlwhi.client.app;
+package com.dlwhi.client.model;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -6,12 +6,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Method;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import com.dlwhi.client.json.JSONArgument;
-import com.dlwhi.client.json.JSONCommand;
 
 public class Connection implements Closeable {
     private final char[] probeCharset = new char[]{0x0A, 0x0D};

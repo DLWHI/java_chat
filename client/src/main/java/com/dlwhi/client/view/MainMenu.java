@@ -1,20 +1,20 @@
-package com.dlwhi.client.menu;
+package com.dlwhi.client.view;
 
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.HashMap;
-
 import org.springframework.stereotype.Component;
 
 import com.dlwhi.client.exceptions.InvalidCommandException;
 
-@Component("login")
-public class LoginMenu implements Menu {
+@Component("main")
+public class MainMenu implements Menu {
     private static final String text =
-        "1. Sign In%n" +
-        "2. Sign Up%n" +
-        "3. Exit%n";
+        "1. Enter a room%n" +
+        "2. Create room%n" +
+        "3. Logout%n" +
+        "4. Exit%n";
 
     private Map<String, String> commands = new HashMap<>();
 

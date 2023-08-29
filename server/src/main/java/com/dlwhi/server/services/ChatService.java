@@ -1,20 +1,23 @@
 package com.dlwhi.server.services;
 
+import org.springframework.stereotype.Component;
+
 import com.dlwhi.server.models.User;
-import com.dlwhi.server.repositories.IUserRepository;
+import com.dlwhi.server.repositories.UserRepository;
 
-public class ChatService implements IUserService {
-    private IUserRepository userRepo;
+@Component
+public class ChatService implements UserService {
+    private UserRepository userRepo;
 
-    public void setUserRepo(IUserRepository userRepo) {
+    public void setUserRepo(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
 
     @Override
     public User login(String username, String password) {
         User user = userRepo.findByUsername(username);
-        if (user == null) {
-            return null;
+        if (user != null && user.passwdMatches(password)) {
+            return user;
         }
         return null;
     }

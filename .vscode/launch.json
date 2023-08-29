@@ -25,7 +25,7 @@
             "type": "java",
             "name": "Server",
             "request": "launch",
-            "mainClass": "com.dlwhi.server.app.MainServer",
+            "mainClass": "com.dlwhi.server.view.MainServer",
             "projectName": "server"
         }
     ],
