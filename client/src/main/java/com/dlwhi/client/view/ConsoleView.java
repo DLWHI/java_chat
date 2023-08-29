@@ -23,8 +23,6 @@ public class ConsoleView implements View {
 
     private boolean exited = false;
 
-    Thread viewThread;
-
     @Override
     public void show() {
         currentContext.display(out);
@@ -32,7 +30,7 @@ public class ConsoleView implements View {
         out.println("-> ");
         String cmd = currentContext.dispatchInput(in);
         for (Controller sub : subscribers) {
-            sub.notifyController(cmd);
+            sub.sendCommand(cmd);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.dlwhi.client.model;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -15,12 +16,29 @@ public class User {
         this.conn = conn;
     }
 
+    public void call(String command) 
+        throws IllegalAccessException,
+            IllegalArgumentException, 
+            InvocationTargetException {
+        commands.get(command).invoke(command, new Object[0]);
+    }
+
+    public void bindMethods() {
+        for (Method method : getClass().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Binded.class)) {
+                Binded bind = method.getAnnotation(Binded.class);
+                method.setAccessible(true);
+                commands.put(bind.command(), method);
+            }
+        }
+    }
+
     // TODO map methods to commands
-    @Binded(command = "sign_in", parameterNames = { "username", "password" })
-    public void signIn(String username, String passwd) {
+    @Binded(command = "sign_in")
+    public void signIn() {
         try {
             JSONCommand toSend = new JSONCommand("sign_in");
-            toSend.addArgument(new JSONArgument("username", username)).addArgument(new JSONArgument("password", passwd));
+            toSend.addArgument(new JSONArgument("username", "")).addArgument(new JSONArgument("password", ""));
             conn.send(toSend.toString());
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -28,8 +46,8 @@ public class User {
         }
     }
 
-    @Binded(command = "sign_up", parameterNames = { "username", "password" })
-    public void signUp(String username, String passwd) {
+    @Binded(command = "sign_up")
+    public void signUp() {
 
     }
 }
