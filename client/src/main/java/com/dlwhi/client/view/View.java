@@ -1,15 +1,10 @@
 package com.dlwhi.client.view;
 
-import java.io.Closeable;
-
-import com.dlwhi.client.app.Controller;
-
-public interface View extends Closeable {
+public interface View {
     void show();
-    void close();
 
     void notifyRecieve(String message);
-    void subscribeOnAllCommands(Controller subscriber);
+    public void subscribe(String event, Call action);
 
     void setActiveContext(String contextName);
     public void addContext(Menu context);

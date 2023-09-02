@@ -16,11 +16,11 @@ public class User {
         this.conn = conn;
     }
 
-    public void call(String command) 
+    public void call(String command, String[] args) 
         throws IllegalAccessException,
             IllegalArgumentException, 
             InvocationTargetException {
-        commands.get(command).invoke(command, new Object[0]);
+        commands.get(command).invoke(command, (Object[])args);
     }
 
     public void bindMethods() {
@@ -35,10 +35,10 @@ public class User {
 
     // TODO map methods to commands
     @Binded(command = "sign_in")
-    public void signIn() {
+    public void signIn(String user, String passwd) {
         try {
             JSONCommand toSend = new JSONCommand("sign_in");
-            toSend.addArgument(new JSONArgument("username", "")).addArgument(new JSONArgument("password", ""));
+            toSend.addArgument(new JSONArgument("username", user)).addArgument(new JSONArgument("password", passwd));
             conn.send(toSend.toString());
         } catch (IOException e) {
             // TODO Auto-generated catch block

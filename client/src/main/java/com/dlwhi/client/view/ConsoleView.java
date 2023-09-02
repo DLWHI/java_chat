@@ -2,41 +2,28 @@ package com.dlwhi.client.view;
 
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.stereotype.Component;
 
-import com.dlwhi.client.app.Controller;
+import com.dlwhi.client.exceptions.InvalidCommandException;
 
 @Component
 public class ConsoleView implements View {
     private final PrintStream out = System.out;
     private final Scanner in = new Scanner(System.in);
     
-    private List<Controller> subscribers = new LinkedList<>();
-
+    private Map<String, String> commands = new HashMap<>();
     private Map<String, Menu> contexts = new HashMap<>();
     private Menu currentContext;
-
-    private boolean exited = false;
 
     @Override
     public void show() {
         currentContext.display(out);
         out.println("---------------------");
         out.println("-> ");
-        String cmd = currentContext.dispatchInput(in);
-        for (Controller sub : subscribers) {
-            sub.sendCommand(cmd);
-        }
-    }
-
-    @Override
-    public void subscribeOnAllCommands(Controller subscriber) {
-        subscribers.add(subscriber);
+        currentContext.dispatchInput(in);
     }
 
     @Override
@@ -49,16 +36,27 @@ public class ConsoleView implements View {
         currentContext = contexts.get(contextName);
     }
 
+    @Override
     public void addContext(Menu context) {
         contexts.put(context.getClass().getSimpleName(), context);
     }
 
+    @Override
     public void addContext(String name, Menu context) {
         contexts.put(name, context);
     }
 
     @Override
-    public void close() {
-        throw new UnsupportedOperationException("Unsupported operation 'close'");
+    public void subscribe(String event, Call action) {
+        try {
+            Option targetEvent = (Option)getClass().getDeclaredField(event).get(this);
+            // targetEvent.add(action);
+        } catch (NoSuchFieldException e) {
+            System.out.printf("No event named %s%n", event);
+        } catch (SecurityException | 
+                IllegalAccessException | 
+                IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
     }
 }

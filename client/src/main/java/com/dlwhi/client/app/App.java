@@ -2,12 +2,12 @@ package com.dlwhi.client.app;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-
 import org.springframework.beans.factory.annotation.Value;
 
 import com.dlwhi.client.model.Binded;
 import com.dlwhi.client.model.Connection;
 import com.dlwhi.client.model.User;
+import com.dlwhi.client.view.Call;
 import com.dlwhi.client.view.View;
 
 public class App implements Controller {
@@ -22,7 +22,6 @@ public class App implements Controller {
 
     public App(View view) {
         this.view = view;
-        view.subscribeOnAllCommands(this);
     }
 
     public int exec() throws IOException {
@@ -41,17 +40,12 @@ public class App implements Controller {
         exited = true;
     }
 
+    public boolean notifyLogin(String[] args) {
+        return true;
+    }
+
     @Override
-    public void sendCommand(String command) {
-        try {
-            if (command.equals("exit")){
-                exit();
-            } else {
-                model.call(command);
-            }
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void notifySendMessage(String message) {
+        
     }
 }

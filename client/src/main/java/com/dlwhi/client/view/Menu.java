@@ -1,44 +1,35 @@
 package com.dlwhi.client.view;
 
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 import com.dlwhi.client.exceptions.InvalidCommandException;
 
 public class Menu {
-    private final String text;
-
-    private Map<String, String> commands = new HashMap<>();
-
-    public Menu(String text) {
-        this.text = text;
-    }
-
-    public Menu(String text, Map<String, String> commands) {
-        this.text = text;
-        this.commands = commands;
-    }
+    private Map<String, Option> content = new LinkedHashMap<>();
 
     public void display(PrintStream out) {
-        out.println(text);
-    }
-
-    public String dispatchInput(Scanner in) {
-        String input = in.nextLine();
-        String command = commands.get(input);
-        if (command == null) {
-            throw new InvalidCommandException("Unknown command " + input);
+        int no = 0;
+        for (Option option : content.values()) {
+            System.out.printf("%d. ", ++no);
+            option.display(out);
         }
-        return command;
     }
 
-    public void addCommand(String value, String name) {
-        commands.put(value, name);
+    public void dispatchInput(Scanner in) {
+        String input = in.nextLine();
+        Option target = content.get(input);
+        if (content == null) {
+            throw new InvalidCommandException("Unknown command " + input);
+        } else {
+            target.fire(in);
+        }
+        
     }
 
-    public void setActiveCommands(Map<String, String> commands) {
-        this.commands = commands;
+    public void addOption(Option value, String command) {
+        content.put(command, value);
     }
 }
