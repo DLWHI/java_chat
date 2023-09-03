@@ -25,6 +25,9 @@ public class Option {
     }
 
     public void fire(Scanner source) {
+        if (onChooseEvent == null) {
+            return;
+        }
         Object[] args = onChooseEvent.getParameterArray();
         for (int i = 0; i < args.length; ++i) {
             args[i] = source.nextLine();

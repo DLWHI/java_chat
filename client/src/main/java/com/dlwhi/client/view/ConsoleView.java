@@ -13,8 +13,7 @@ import com.dlwhi.client.exceptions.InvalidCommandException;
 public class ConsoleView implements View {
     private final PrintStream out = System.out;
     private final Scanner in = new Scanner(System.in);
-    
-    private Map<String, String> commands = new HashMap<>();
+
     private Map<String, Menu> contexts = new HashMap<>();
     private Menu currentContext;
 

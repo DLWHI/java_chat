@@ -17,14 +17,10 @@ public class MenuBuilder {
     @Bean
     public Menu login() {
         Menu built = new Menu();
-        built.addOption(options.get("signIn"), "1");
-        built.addOption(options.get("signIn"), "Sign In");
-
-        built.addOption(options.get("signUp"), "2");
-        built.addOption(options.get("signUp"), "Sign Up");
-
-        built.addOption(options.get("exit"), "3");
-        built.addOption(options.get("exit"), "Exit");
+        built.addOption(options.get("signIn"), "sign_in");
+        built.addOption(options.get("signUp"), "sign_up");
+        built.addOption(options.get("exit"), "exit");
+        
         return built;
     }
 

@@ -1,7 +1,11 @@
 package com.dlwhi.client.view;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -9,6 +13,7 @@ import com.dlwhi.client.exceptions.InvalidCommandException;
 
 public class Menu {
     private Map<String, Option> content = new LinkedHashMap<>();
+    private Map<String, String> binds = new HashMap<>();
 
     public void display(PrintStream out) {
         int no = 0;
@@ -20,16 +25,20 @@ public class Menu {
 
     public void dispatchInput(Scanner in) {
         String input = in.nextLine();
-        Option target = content.get(input);
-        if (content == null) {
+        String alias = binds.get(input);
+        if (alias == null) {
             throw new InvalidCommandException("Unknown command " + input);
         } else {
-            target.fire(in);
+            content.get(alias).fire(in);
         }
         
     }
 
-    public void addOption(Option value, String command) {
-        content.put(command, value);
+    public void addOption(Option value, String name) {
+        content.put(name, value);
+    }
+
+    public void bind(String optionName, String alias) {
+        binds.put(alias, optionName);
     }
 }
