@@ -4,7 +4,6 @@ public interface View {
     void show();
 
     void notifyRecieve(String message);
-    public void subscribe(String event, Call action);
 
     void setActiveContext(String contextName);
     public void addContext(Menu context);

@@ -21,6 +21,14 @@ public class MenuBuilder {
         built.addOption(options.get("signUp"), "sign_up");
         built.addOption(options.get("exit"), "exit");
         
+        built.bind("sign_up", "1");
+        built.bind("sign_up", "sign in");
+
+        built.bind("sign_up", "2");
+        built.bind("sign_up", "sign up");
+
+        built.bind("sign_up", "3");
+        built.bind("exit", "exit");
         return built;
     }
 

@@ -44,18 +44,4 @@ public class ConsoleView implements View {
     public void addContext(String name, Menu context) {
         contexts.put(name, context);
     }
-
-    @Override
-    public void subscribe(String event, Call action) {
-        try {
-            Option targetEvent = (Option)getClass().getDeclaredField(event).get(this);
-            // targetEvent.add(action);
-        } catch (NoSuchFieldException e) {
-            System.out.printf("No event named %s%n", event);
-        } catch (SecurityException | 
-                IllegalAccessException | 
-                IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-        }
-    }
 }
