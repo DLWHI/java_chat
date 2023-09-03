@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.dlwhi.client.app.App;
 import com.dlwhi.client.view.ConsoleView;
-import com.dlwhi.client.view.Option;
 import com.dlwhi.client.view.Menu;
 import com.dlwhi.client.view.View;
 
