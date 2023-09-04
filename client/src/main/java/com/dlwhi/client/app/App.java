@@ -22,6 +22,7 @@ public class App implements Controller {
 
     public App(View view) {
         this.view = view;
+        view.subscribe("exit", Call.extract(view, "exit"));
     }
 
     public int exec() throws IOException {

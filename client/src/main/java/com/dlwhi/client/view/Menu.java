@@ -7,15 +7,22 @@ import java.util.Scanner;
 
 import com.dlwhi.client.exceptions.InvalidCommandException;
 
-public class Menu {
+public class Menu implements Context {
+    private final PrintStream out;
+    private final Scanner in;
+
     private Integer lineCount = 0;
     private String content = "";
     private Map<String, String> binds = new HashMap<>();
 
-    public void display(PrintStream out) {
+    @Override
+    public void show(PrintStream out) {
         System.out.printf(content);
+        out.println("---------------------");
+        out.println("-> ");
     }
 
+    @Override
     public String dispatchInput(Scanner in) throws InvalidCommandException {
         String input = in.nextLine();
         String command = binds.get(input.toLowerCase());
@@ -23,6 +30,16 @@ public class Menu {
             throw new InvalidCommandException("Unkown command " + input);
         }
         return command;
+    }
+
+    @Override
+    public void subscribe(String event, Call handler) {
+
+    }
+
+    @Override
+    void notifyRecieve(String message) {
+
     }
 
     public void addLine(String text) {
