@@ -7,20 +7,22 @@ import com.dlwhi.client.view.Menu;
 
 @Configuration
 public class MenuBuilder {
-    
     @Bean
     public Menu login() {
-        Menu built = new Menu();
-        built.addLine("Sign in");
-        built.addLine("Sign up");
-        built.addLine("Exit");
-
-        return built;
+        Menu loginMenu = new Menu();
+        loginMenu.addLine("Sign in");
+        loginMenu.addLine("Sign up");
+        loginMenu.addLine("Exit");
+        return loginMenu;
     }
 
     @Bean
     public Menu main() {
-        Menu built = new Menu();
-        return built;
+        Menu mainMenu = new Menu();
+        mainMenu.addLine("Enter room");
+        mainMenu.addLine("Create room");
+        mainMenu.addLine("Logout");
+        mainMenu.addLine("Exit");
+        return mainMenu;
     }
 }

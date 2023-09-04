@@ -2,13 +2,9 @@ package com.dlwhi.client.view;
 
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.dlwhi.client.exceptions.BadBindException;
 import com.dlwhi.client.exceptions.InvalidCommandException;
 
 public class Menu {
@@ -20,9 +16,9 @@ public class Menu {
         System.out.printf(content);
     }
 
-    public String dispatchInput(Scanner in) {
+    public String dispatchInput(Scanner in) throws InvalidCommandException {
         String input = in.nextLine();
-        String command = binds.get(input);
+        String command = binds.get(input.toLowerCase());
         if (command == null) {
             throw new InvalidCommandException("Unkown command " + input);
         }
@@ -34,6 +30,6 @@ public class Menu {
     }
 
     public void addCommand(String command, String alias) {
-        binds.put(alias, command);
+        binds.put(alias.toLowerCase(), command);
     }
 }

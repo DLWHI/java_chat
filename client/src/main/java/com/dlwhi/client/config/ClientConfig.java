@@ -1,17 +1,8 @@
 package com.dlwhi.client.config;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.reflect.Field;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
-import javax.sound.midi.Patch;
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,10 +17,16 @@ import com.dlwhi.client.view.View;
 @Configuration
 @ComponentScan(basePackages = "com.dlwhi.client.view")
 public class ClientConfig {
-    private final String cmdConfigFile = "/config/com/dlwhi/commands.cfg";
-
     @Autowired
     private Map<String, Menu> menus;
+
+    @Autowired
+    private BindConfig binder;
+
+    @PostConstruct
+    private void bind() {
+        binder.bindMenus(menus);
+    }
 
     @Bean
     public View console() {

@@ -14,6 +14,7 @@ public class ConsoleView implements View {
     private final PrintStream out = System.out;
     private final Scanner in = new Scanner(System.in);
 
+    private Map<String, Call> events = new HashMap<>();
     private Map<String, Menu> contexts = new HashMap<>();
     private Menu currentContext;
 
@@ -22,7 +23,15 @@ public class ConsoleView implements View {
         currentContext.display(out);
         out.println("---------------------");
         out.println("-> ");
-        currentContext.dispatchInput(in);
+        String command = null;
+        while (command == null) {
+            try {
+                command = currentContext.dispatchInput(in);
+            } catch (InvalidCommandException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        events.get(command).invoke(null);
     }
 
     @Override
@@ -43,5 +52,10 @@ public class ConsoleView implements View {
     @Override
     public void addContext(String name, Menu context) {
         contexts.put(name, context);
+    }
+
+    @Override
+    public void subscribe(String event, Call handler) {
+        events.put(event, handler);
     }
 }
