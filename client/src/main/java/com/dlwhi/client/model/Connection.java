@@ -56,5 +56,4 @@ public class Connection implements Closeable {
             System.err.println("Connection closed");
         }
     }
-    
 }

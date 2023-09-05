@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import com.dlwhi.client.json.JSONPackage;
 import com.dlwhi.client.model.Command;
 import com.dlwhi.client.model.Connection;
-import com.dlwhi.client.view.Call;
 import com.dlwhi.client.view.Context;
 import com.dlwhi.client.view.Menu;
 
@@ -21,8 +20,6 @@ public class App implements Closeable {
     private int port;
 
     private Connection conn;
-
-    private Map<String, Call> events = new HashMap<>();
 
     private Map<String, Context> contexts = new HashMap<>();
     private Context currentContext;
@@ -64,6 +61,7 @@ public class App implements Closeable {
     public void signUp() {
 
     }
+    
     public void setActiveContext(String contextName) {
         currentContext = contexts.get(contextName);
     }
