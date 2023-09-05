@@ -37,6 +37,10 @@ public class Connection implements Closeable {
         out.flush();
     }
 
+    public String waitForResponse() throws IOException {
+        return in.readLine();
+    }
+
     @Override
     public void close() {
         if (!socket.isClosed()) {

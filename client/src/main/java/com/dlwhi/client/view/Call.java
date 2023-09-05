@@ -2,16 +2,24 @@ package com.dlwhi.client.view;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+
 
 // Wrapper class to call method of object
 public class Call {
     private final Object target;
     private final Method method;
+    private final String[] paramNames;
 
     public Call(Object target, Method method) {
         this.target = target;
         this.method = method;
         method.setAccessible(true);
+        Parameter[] params = method.getParameters();
+        paramNames = new String[method.getParameterCount()];
+        for (int i = 0; i < paramNames.length; i++) {
+            paramNames[i] = params[i].getName();
+        }
     }
 
     // Tries to wrap method named methodNa of object target
@@ -68,5 +76,13 @@ public class Call {
     // Return array to store parameters
     Object[] getParameterArray() {
         return new Object[method.getParameterCount()];
+    }
+
+    void setParamaterName(int index, String name) {
+        paramNames[index] = name;
+    }
+
+    String getParameterName(int index) {
+        return paramNames[index];
     }
 }

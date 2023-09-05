@@ -49,6 +49,7 @@ public class Client extends Thread implements Closeable {
             while (true) {
                 String data = in.readLine();
                 System.out.println(data);
+                write("success");
             }
         } catch (IOException e) {
             System.err.println(e.getMessage() + " on " + connection.getInetAddress());

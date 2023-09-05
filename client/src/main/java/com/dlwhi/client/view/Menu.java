@@ -36,8 +36,8 @@ public class Menu implements Context {
         if (command == null) {
             throw new InvalidCommandException("Unkown command " + input);
         }
-        Object[] params = calls.get(command).getParameterArray();
-        calls.get(command).invoke(params);
+        calls.get(command).invoke(collectParameters(calls.get(command)));
+        out.println("---------------------");
         return command;
     }
 
@@ -60,5 +60,14 @@ public class Menu implements Context {
 
     public void addCommand(String command, String alias) {
         commands.put(alias.toLowerCase(), command);
+    }
+
+    private Object[] collectParameters(Call call) {
+        Object[] params = call.getParameterArray();
+        for (int i = 0; i < params.length; i++) {
+            System.out.println("Enter " + call.getParameterName(i));
+            params[i] = in.nextLine();
+        }
+        return params;
     }
 }

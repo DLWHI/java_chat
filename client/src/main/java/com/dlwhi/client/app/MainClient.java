@@ -17,8 +17,9 @@ public class MainClient
             ctx.getEnvironment().getPropertySources().addFirst(cmdOpt);
             ctx.scan("com.dlwhi.client.config");
             ctx.refresh();
-            App app = ctx.getBean("controller", App.class);
-            app.exec();
+            try (App app = ctx.getBean("controller", App.class)) {
+                app.exec();
+            }
         } catch (IOException e) {
             System.out.println("Unexpected IOException occured:");
             System.out.println(e.getMessage());
