@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import com.dlwhi.client.json.JSONPackage;
+import com.dlwhi.JSONPackage;
 import com.dlwhi.client.model.Command;
 import com.dlwhi.client.model.Connection;
 import com.dlwhi.client.view.Context;

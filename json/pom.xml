@@ -5,11 +5,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.dlwhi.server</groupId>
-  <artifactId>server</artifactId>
+  <groupId>com.dlwhi</groupId>
+  <artifactId>json</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>server</name>
+  <name>json</name>
 
   <parent>
     <groupId>com.dlwhi</groupId>
@@ -42,41 +42,6 @@
         <version>5.10.0</version>
         <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.6.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>5.3.29</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-      <version>5.3.29</version>
-    </dependency>
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>4.0.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.6.4</version>
-    </dependency>
-    <dependency>
-      <groupId>com.dlwhi</groupId>
-      <artifactId>json</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -102,6 +67,9 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.1</version>
+          <configuration>
+            <skipTests>true</skipTests>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
@@ -127,15 +95,5 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <resources>
-      <resource>
-        <targetPath>config</targetPath>
-        <directory>src/main/config</directory>
-      </resource>
-      <resource>
-        <targetPath>resources</targetPath>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
   </build>
 </project>

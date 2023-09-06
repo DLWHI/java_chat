@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import com.dlwhi.JSONPackage;
 import com.dlwhi.server.models.User;
 import com.dlwhi.server.services.ChatService;
 import com.dlwhi.server.services.UserService;
@@ -47,9 +48,13 @@ public class Client extends Thread implements Closeable {
         try {
             // TODO add disconnect option
             while (true) {
-                String data = in.readLine();
-                System.out.println(data);
-                write("success");
+                JSONPackage data = JSONPackage.fromString(in.readLine());
+                User usr = service.register(data.get("username").toString(), data.get("password").toString());
+                if (usr != null) {
+                    write((new JSONPackage("status", "success")).toString());
+                } else {
+                    write((new JSONPackage("status", "fail")).toString());
+                }
             }
         } catch (IOException e) {
             System.err.println(e.getMessage() + " on " + connection.getInetAddress());

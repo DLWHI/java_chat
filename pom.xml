@@ -5,17 +5,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.dlwhi.server</groupId>
-  <artifactId>server</artifactId>
+  <groupId>com.dlwhi</groupId>
+  <artifactId>chat</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-  <name>server</name>
-
-  <parent>
-    <groupId>com.dlwhi</groupId>
-    <artifactId>chat</artifactId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
+  <name>chat</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,61 +18,11 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.10.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-params</artifactId>
-        <version>5.10.0</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-api</artifactId>
-        <version>5.10.0</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.6.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>5.3.29</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-      <version>5.3.29</version>
-    </dependency>
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>4.0.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.6.4</version>
-    </dependency>
-    <dependency>
-      <groupId>com.dlwhi</groupId>
-      <artifactId>json</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>json</module>
+    <module>client</module>
+    <module>server</module>
+  </modules>
 
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to
@@ -127,15 +72,5 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <resources>
-      <resource>
-        <targetPath>config</targetPath>
-        <directory>src/main/config</directory>
-      </resource>
-      <resource>
-        <targetPath>resources</targetPath>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
   </build>
 </project>

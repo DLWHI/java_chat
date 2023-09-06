@@ -5,4 +5,3 @@ public class NoSuchEventException extends RuntimeException {
         super(message);
     }
 }
-
