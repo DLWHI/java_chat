@@ -18,14 +18,14 @@
             "projectName": "client",
             "args": [
                 "--hostname=localhost",
-                "--port=9857"
+                "--port=9999"
             ]
         },
         {
             "type": "java",
             "name": "Server",
             "request": "launch",
-            "mainClass": "com.dlwhi.server.view.MainServer",
+            "mainClass": "com.dlwhi.server.controller.MainServer",
             "projectName": "server"
         }
     ],

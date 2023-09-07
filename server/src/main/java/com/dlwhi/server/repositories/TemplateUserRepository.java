@@ -9,18 +9,25 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
 import com.dlwhi.server.models.User;
 
 public class TemplateUserRepository implements UserRepository {
 
-    private final String findQuery = "select * from users where id = :users.id";
-    private final String findUNameQuery = "select * from users where username = :users.un";
-    private final String insertQuery = "insert into " + 
-        "users(username, password) values(:users.un, :users.passwd)";
-    private final String updateQuery = "update users set " +
-        "username = :users.un, password = :users.passwd where id = :users.id";
-    private final String deleteQuery = "delete from users where id = :users.id;";
-    private final String findAll = "select * from users";
+    private final String findQuery =
+        "select * from users where id = ?";
+    private final String findUNameQuery =
+        "select * from users where username = ?";
+    private final String insertQuery =
+        "insert into users(?, ?) values(?, ?)";
+    private final String updateQuery = 
+        "update users set username = ?, password = ? where id = ?";
+    private final String deleteQuery =
+        "delete from users where id = ?";
+    private final String findAll =
+        "select * from users";
 
     private DataSource DB;
 
@@ -61,7 +68,7 @@ public class TemplateUserRepository implements UserRepository {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return entity;
+        return findByUsername(entity.getUsername());
     }
 
     @Override
@@ -85,10 +92,10 @@ public class TemplateUserRepository implements UserRepository {
     }
 
     @Override
-    public User findByUsername(String email) {
+    public User findByUsername(String username) {
         try (Connection conn = DB.getConnection()) {
             PreparedStatement query = conn.prepareStatement(findUNameQuery);
-            query.setString(1, email);
+            query.setString(1, username);
             ResultSet queryResult =  query.executeQuery();
             if (queryResult.next()) {
                 return User.fromResultSet(queryResult);

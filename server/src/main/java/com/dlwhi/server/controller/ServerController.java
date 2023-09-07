@@ -1,4 +1,4 @@
-package com.dlwhi.server.view;
+package com.dlwhi.server.controller;
 
 import java.net.ServerSocket;
 import java.net.Socket;

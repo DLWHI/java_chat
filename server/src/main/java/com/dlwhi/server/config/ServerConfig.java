@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 
+import com.dlwhi.server.controller.ServerController;
 import com.dlwhi.server.repositories.TemplateUserRepository;
 import com.dlwhi.server.repositories.UserRepository;
 import com.dlwhi.server.services.ChatService;
-import com.dlwhi.server.view.ServerController;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
