@@ -1,9 +1,11 @@
 package com.dlwhi;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.Set;
 
 public class JSONPackage {
     private JSONPackage parent = null;
@@ -60,6 +62,10 @@ public class JSONPackage {
         return args.get(param).toString()   ;
     }
 
+    public int getAsInt(String param) {
+        return Integer.valueOf(getAsInt(param));
+    }
+
     public JSONPackage getParent() {
         return parent;
     }
@@ -67,12 +73,17 @@ public class JSONPackage {
     @Override
     public String toString() {
         String json = "{";
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
-            if (entry.getValue() instanceof Number) {
-                json += entry.getKey() + ": " + entry.getValue().toString() + ",";
-            } else {
-                json += entry.getKey() + ": \"" + entry.getValue().toString() + "\",";
-            }
+        Set<Map.Entry<String, Object>> entries = args.entrySet();
+        Iterator<Map.Entry<String, Object>> i = entries.iterator();
+        Map.Entry<String, Object> entry;
+        if (i.hasNext()) {
+            entry = i.next();
+            json += "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"";
+        }
+        while (i.hasNext()) {
+            entry = i.next();
+            json += ",";
+            json += "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"";
         }
         return json + "}";
     }

@@ -55,7 +55,9 @@ public class App implements Closeable {
             conn.send(toSend.toString());
             JSONPackage res = conn.waitForResponse();
             currentContext.notifyRecieve(res.getAsString("message"));
-            setActiveContext("main");
+            if (res.getAsInt("status") == 200) {
+                setActiveContext("main");
+            }
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

@@ -1,0 +1,11 @@
+{
+    "object1": {
+        "entry1": "one",
+        "entry2": 2
+    },
+    "entry1": "one",
+    "entry2": 2,
+    "object2": {
+        "lacresha": 16.5
+    }
+}

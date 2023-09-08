@@ -1,0 +1,17 @@
+{
+    "array": [
+        "one",
+        "tho",
+        "three",
+        4,
+        "five",
+        6,
+        7
+    ],
+    "entry": "entry",
+    "integer": 23,
+    "object": {
+        "entry1": "one",
+        "entry2": 2
+    }
+}

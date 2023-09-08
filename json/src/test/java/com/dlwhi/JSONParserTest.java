@@ -3,19 +3,21 @@ package com.dlwhi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class JSONParserTest {
     @Test
     public void trivial() {
-        String json = "{entry1: \"data1\", entry2: \"data2\", entry3: \"data3\"}";
+        String json = "{\"entry1\":\"data1\",\"entry2\":\"data2\",\"entry3\":\"data3\"}";
         JSONPackage parsed = JSONPackage.fromString(json);
-        String toStringExpected = "{entry1: \"data1\", entry2: \"data2\", entry3: \"data3\",}";
+        String toStringExpected = "{\"entry1\":\"data1\",\"entry2\":\"data2\",\"entry3\":\"data3\"}";
         assertEquals(toStringExpected, parsed.toString());
     }
 
     @Test
     public void classic() {
-        String json = "{entry1: \"data1\", entry2: \"data2\", entry3: \"data3\",}";
+        String json = "{\"entry1\":\"data1\",\"entry2\":\"data2\",\"entry3\":\"data3\"}";
         JSONPackage parsed = JSONPackage.fromString(json);
         assertEquals(json, parsed.toString());
     }
@@ -31,5 +33,15 @@ public class JSONParserTest {
         assertEquals("data1", parsed.get("entry1").toString());
         assertEquals("data2", parsed.get("entry2").toString());
         assertEquals("data3", parsed.get("entry3").toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource()
+    public void fromFiles() {
+
+    }
+
+    private String readFile() {
+        
     }
 }

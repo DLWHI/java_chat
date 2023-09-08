@@ -47,7 +47,7 @@ public class Client extends Thread implements Closeable {
         out.flush();
     }
 
-    private void response(String status, String message) throws IOException {
+    private void response(int status, String message) throws IOException {
         JSONPackage res = new JSONPackage("status", status).add("message", message);
         write(res.toString());
     }
@@ -81,18 +81,18 @@ public class Client extends Thread implements Closeable {
     private void login(JSONPackage data) throws IOException {
         user = service.login(data.getAsString("username"),data.getAsString("password"));
         if (user == null) {
-            response("fail", "Invalid username or password");
+            response(401, "Invalid username or password");
         } else {
-            response("success", "Successful login");
+            response(200, "Successful login");
         }
     }
 
     @Command("sign_up")
     private void register(JSONPackage data) throws IOException {
         if (service.register(data.getAsString("username"),data.getAsString("password"))) {
-            response("success", "Registered new user");
+            response(401, "Registered new user");
         } else {
-            response("fail", "User exists");
+            response(200, "User exists");
         }
     }
 
