@@ -1,4 +1,4 @@
-package com.dlwhi.client.view;
+package com.dlwhi.server.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -67,7 +67,7 @@ public class Call {
             System.err.printf(
                 "%s threw an exception of type %n",
                 method.getName(),
-                e.getTargetException().getClass().getName()
+                e.getCause().getClass().getName()
             );
         } 
     }

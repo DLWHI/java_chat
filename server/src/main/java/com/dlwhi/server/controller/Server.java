@@ -14,7 +14,7 @@ import com.dlwhi.server.services.ChatService;
 
 @Component("server")
 @PropertySource("classpath:config/com/dlwhi/server.cfg")
-public class ServerController {
+public class Server {
     @Autowired
     private final ChatService service = null;
 
@@ -24,7 +24,6 @@ public class ServerController {
     private boolean exited = false;
 
     private List<Client> clients = new LinkedList<>();
-
 
     public int exec() {
         Thread shutdownListener = new Thread(() -> {
@@ -42,16 +41,12 @@ public class ServerController {
                 Socket socket = server.accept();
                 Client connected = new Client(socket, service);
                 clients.add(connected);
-                connected.start();
+                connected.start();;
                 System.out.println("Active connections: " + clients.size());
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
         return 0; 
-    }
-
-    private void exit() {
-        exited = true;
     }
 }

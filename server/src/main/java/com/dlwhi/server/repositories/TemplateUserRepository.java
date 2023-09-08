@@ -1,109 +1,102 @@
 package com.dlwhi.server.repositories;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import com.dlwhi.server.models.User;
 
 public class TemplateUserRepository implements UserRepository {
 
     private final String findQuery =
-        "select * from users where id = ?";
+        "select * from users where id = :users.id";
     private final String findUNameQuery =
-        "select * from users where username = ?";
+        "select * from users where username = :users.username";
     private final String insertQuery =
-        "insert into users(?, ?) values(?, ?)";
+        "insert into users(username, password) " +
+        "values(:users.username, :users.password) " +
+        "returning users.id, users.username, users.password;";
     private final String updateQuery = 
         "update users set username = ?, password = ? where id = ?";
     private final String deleteQuery =
         "delete from users where id = ?";
-    private final String findAll =
+    private final String findAllQuery =
         "select * from users";
 
-    private DataSource DB;
+    private DataSource db;
 
-    public TemplateUserRepository(DataSource dB) {
-        DB = dB;
+    public TemplateUserRepository(DataSource db) {
+        this.db = db;
     }
 
     @Override
     public User findById(Long id) {
-        try (Connection conn = DB.getConnection()) {
-            PreparedStatement query = conn.prepareStatement(findQuery);
-            query.setLong(1, id);
-            ResultSet queryResult =  query.executeQuery();
-            if (queryResult.next()) {
-                return User.fromResultSet(queryResult);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        User found = null;
+        try {
+            found = query.queryForObject(
+            findQuery,
+            new MapSqlParameterSource("users.id", id),
+            new ModelRowMapper<User>(User.class)
+        );
+        } catch (DataAccessException e) {
         }
-        return null;
+        return found;
     }
 
     @Override
     public List<User> findAll() {
-        List<User> result = new LinkedList<>();
-        try (Connection conn = DB.getConnection()) {
-            
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return result;
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        return query.query(
+            findAllQuery,
+            new ModelRowMapper<User>(User.class)
+        );
     }
 
     @Override
     public User save(User entity) {
-        try (Connection conn = DB.getConnection()) {
-            
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        User inserted = null;
+        try {
+            inserted = query.queryForObject(
+                insertQuery,
+                entity.getParamSource(),
+                new ModelRowMapper<User>(User.class)
+            );
+        } catch (DataAccessException e) {
         }
-        return findByUsername(entity.getUsername());
+        return inserted;
     }
 
     @Override
     public void update(User entity) {
-        try (Connection conn = DB.getConnection()) {
-            
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        query.update(updateQuery, entity.getParamSource());
     }
 
     @Override
     public void delete(Long id) {
-        try (Connection conn = DB.getConnection()) {
-            PreparedStatement query = conn.prepareStatement(deleteQuery);
-            query.setLong(1, id);
-            query.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        }
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        query.update(deleteQuery, new MapSqlParameterSource("users.id", id));
     }
 
     @Override
     public User findByUsername(String username) {
-        try (Connection conn = DB.getConnection()) {
-            PreparedStatement query = conn.prepareStatement(findUNameQuery);
-            query.setString(1, username);
-            ResultSet queryResult =  query.executeQuery();
-            if (queryResult.next()) {
-                return User.fromResultSet(queryResult);
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        User found = null;
+        try {
+            found = query.queryForObject(
+            findUNameQuery,
+            new MapSqlParameterSource("users.username", username),
+            new ModelRowMapper<User>(User.class)
+        );
+        } catch (DataAccessException e) {
         }
-        return null;
+        return found;
     }
     
 }

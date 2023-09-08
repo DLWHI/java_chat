@@ -56,6 +56,10 @@ public class JSONPackage {
         return args.get(param);
     }
 
+    public String getAsString(String param) {
+        return args.get(param).toString()   ;
+    }
+
     public JSONPackage getParent() {
         return parent;
     }

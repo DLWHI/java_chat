@@ -23,7 +23,11 @@ public class ChatService implements UserService {
     }
 
     @Override
-    public User register(String username, String password) {
-        return userRepo.save(new User(username, password));
+    public boolean register(String username, String password) {
+        User user = userRepo.save(new User(username, password));
+        if (user == null) {
+            return false;
+        }
+        return true;
     }
 }

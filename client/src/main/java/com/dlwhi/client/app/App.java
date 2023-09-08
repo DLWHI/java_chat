@@ -42,7 +42,10 @@ public class App implements Closeable {
         exited = true;
     }
 
-    @Command("sign_in")
+    @Command(
+        value = "sign_in",
+        context = {"login"}
+    )
     public void signIn(String username, String password) {
         try {
             JSONPackage toSend = 
@@ -50,18 +53,32 @@ public class App implements Closeable {
                 .add("username", username)
                 .add("password", password);
             conn.send(toSend.toString());
-            System.out.println(conn.waitForResponse());
+            JSONPackage res = conn.waitForResponse();
+            currentContext.notifyRecieve(res.getAsString("message"));
+            setActiveContext("main");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
     }
 
-    @Command("sign_up")
-    public void signUp() {
-
+    @Command(
+        value = "sign_up",
+        context = {"login"}
+    )
+    public void signUp(String username, String password) {
+        try {
+            JSONPackage toSend = 
+            new JSONPackage("command", "sign_up")
+                .add("username", username)
+                .add("password", password);
+            conn.send(toSend.toString());
+            JSONPackage res = conn.waitForResponse();
+            currentContext.notifyRecieve(res.getAsString("message"));       
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
     }
-    
+
     public void setActiveContext(String contextName) {
         currentContext = contexts.get(contextName);
     }

@@ -8,9 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
 
-import com.dlwhi.server.controller.ServerController;
+import com.dlwhi.server.controller.Server;
 import com.dlwhi.server.repositories.TemplateUserRepository;
 import com.dlwhi.server.repositories.UserRepository;
 import com.dlwhi.server.services.ChatService;
@@ -18,7 +17,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @PropertySource("classpath:config/com/dlwhi/db.cfg")
-@Import(ServerController.class)
+@Import(Server.class)
 public class ServerConfig {
     @Value("${db.url}")
     private String dbUrl;
@@ -31,10 +30,10 @@ public class ServerConfig {
 
     @Autowired
     @Qualifier("server")
-    private ServerController server;
+    private Server server;
 
     @Bean
-    public ServerController serverInstance() {
+    public Server serverInstance() {
         return server;
     }
 
@@ -56,7 +55,6 @@ public class ServerConfig {
     }
 
     @Bean
-    @Scope(value = "prototype")
     public UserRepository userRepository(DataSource ds) {
         return new TemplateUserRepository(ds);
     }

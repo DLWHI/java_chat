@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.dlwhi.client.exceptions.BadBindException;
 import com.dlwhi.client.exceptions.InvalidCommandException;
 import com.dlwhi.client.exceptions.NoSuchEventException;
 
@@ -42,10 +43,7 @@ public class Menu implements Context {
     }
 
     @Override
-    public void subscribe(String event, Call handler) throws NoSuchEventException {
-        if (!commands.containsValue(event)) {
-            throw new NoSuchEventException(event);
-        }
+    public void subscribe(String event, Call handler) {
         calls.put(event, handler);
     }
 
@@ -58,7 +56,12 @@ public class Menu implements Context {
         content += (++lineCount).toString() + ". " + text + "%n";
     }
 
-    public void addCommand(String command, String alias) {
+    public void addCommand(String command, String alias) throws NoSuchEventException {
+        if (!calls.containsKey(command)) {
+            throw new NoSuchEventException("Unknown command for context");
+        } else if (commands.containsKey(alias)) {
+            throw new BadBindException("Duplicate bind to alias \"" + alias + "\"");
+        }
         commands.put(alias.toLowerCase(), command);
     }
 

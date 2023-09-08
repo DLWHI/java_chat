@@ -6,16 +6,14 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
-import com.dlwhi.server.exceptions.MismatchedColumnsException;
-
-public class User {
+public class User implements DatabaseModel {
     private static final String tableName = "users";
     
-    private Long id = null;
+    private Long id;
     private String username;
     private String password;
 
-    private User() {
+    public User() {
     }
 
     public User(String username, String password) {
@@ -23,30 +21,11 @@ public class User {
         this.password = password;
     }
 
-    public static User fromResultSet(ResultSet queryResult) 
+    public void fromResultSet(ResultSet queryResult) 
             throws SQLException {
-        User created = new User();
-        created.id = queryResult.getLong(User.tableName + ".id");
-        created.username = queryResult.getString(User.tableName + ".username");
-        created.password = queryResult.getString(User.tableName + ".password");
-        return created;
-    }
-
-    public static User fromResultSet(ResultSet queryResult, String... columnNames) 
-            throws SQLException {
-        User created = new User();
-        if (columnNames.length != 3) {
-            throw new MismatchedColumnsException(
-                String.format(
-                    "Invalid column count, got %d, expected 3",
-                    columnNames.length
-                )
-            );
-        }
-        created.id = queryResult.getLong(columnNames[0]);
-        created.username = queryResult.getString(columnNames[1]);
-        created.password = queryResult.getString(columnNames[2]);
-        return created;
+        id = queryResult.getLong("id");
+        username = queryResult.getString("username");
+        password = queryResult.getString("password");
     }
 
     public SqlParameterSource getParamSource() {
@@ -54,8 +33,8 @@ public class User {
         if (id != null) {
             params.addValue(tableName + ".id", id);
         }
-        params.addValue(tableName + ".un", username);
-        params.addValue(tableName + ".passwd", password);
+        params.addValue(tableName + ".username", username);
+        params.addValue(tableName + ".password", password);
         return params;
     }
 

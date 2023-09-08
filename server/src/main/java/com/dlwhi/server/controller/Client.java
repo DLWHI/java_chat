@@ -7,13 +7,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.Map;
 
 import com.dlwhi.JSONPackage;
 import com.dlwhi.server.models.User;
 import com.dlwhi.server.services.ChatService;
-import com.dlwhi.server.services.UserService;
 
 public class Client extends Thread implements Closeable {
+    private static Map<String, Call> events;
+    
     private final Socket connection;
     private final BufferedReader in;
     private final BufferedWriter out;
@@ -43,23 +45,50 @@ public class Client extends Thread implements Closeable {
         out.flush();
     }
 
+    private void response(String status, String message) throws IOException {
+        JSONPackage res = new JSONPackage("status", status).add("message", message);
+        write(res.toString());
+    }
+
     @Override
     public void run() {
         try {
-            // TODO add disconnect option
             while (true) {
                 JSONPackage data = JSONPackage.fromString(in.readLine());
-                User usr = service.register(data.get("username").toString(), data.get("password").toString());
-                if (usr != null) {
-                    write((new JSONPackage("status", "success")).toString());
-                } else {
-                    write((new JSONPackage("status", "fail")).toString());
+                // TODO client factory
+                // Call event = events.get(data.getAsString("command"));
+                // if (event != null) {
+                //     event.invoke(data);
+                // }
+                if (data.getAsString("command").equals("sign_in")) {
+                    login(data);
+                } else if (data.getAsString("command").equals("sign_up")) {
+                    register(data);
                 }
             }
         } catch (IOException e) {
             System.err.println(e.getMessage() + " on " + connection.getInetAddress());
         }
         close();
+    }
+
+    @Command("sign_in")
+    private void login(JSONPackage data) throws IOException {
+        user = service.login(data.getAsString("username"),data.getAsString("password"));
+        if (user == null) {
+            response("fail", "Invalid username or password");
+        } else {
+            response("success", "Successful login");
+        }
+    }
+
+    @Command("sign_up")
+    private void register(JSONPackage data) throws IOException {
+        if (service.register(data.getAsString("username"),data.getAsString("password"))) {
+            response("success", "Registered new user");
+        } else {
+            response("fail", "User exists");
+        }
     }
 
     @Override
@@ -77,5 +106,4 @@ public class Client extends Thread implements Closeable {
             System.err.println("Closed client " + connection.getInetAddress());
         }
     }
-
 }

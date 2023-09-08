@@ -9,6 +9,8 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import com.dlwhi.JSONPackage;
+
 public class Connection implements Closeable {
     private final char[] probeCharset = new char[]{0x0A, 0x0D};
 
@@ -17,8 +19,7 @@ public class Connection implements Closeable {
     private final BufferedReader in;
     private final BufferedWriter out;
 
-    private int userID;
-    private String user;
+    private int bufferSize = 256;
 
     public Connection(String host, int port) throws UnknownHostException, IOException {
         socket = new Socket(host, port);
@@ -37,8 +38,15 @@ public class Connection implements Closeable {
         out.flush();
     }
 
-    public String waitForResponse() throws IOException {
-        return in.readLine();
+    public JSONPackage waitForResponse() throws IOException {
+        char[] buffer = new char[bufferSize];
+        String res = "";
+        int bytes;
+        do {
+            bytes = in.read(buffer);
+            res += String.valueOf(buffer);
+        } while (bytes < 0 && bytes < bufferSize);
+        return JSONPackage.fromString(res);
     }
 
     @Override
@@ -55,5 +63,9 @@ public class Connection implements Closeable {
             }
             System.err.println("Connection closed");
         }
+    }
+
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
     }
 }
