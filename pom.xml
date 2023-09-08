@@ -20,6 +20,7 @@
 
   <modules>
     <module>json</module>
+    <module>event_system</module>
     <module>client</module>
     <module>server</module>
   </modules>

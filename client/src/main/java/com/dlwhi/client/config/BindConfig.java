@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import com.dlwhi.client.app.App;
 import com.dlwhi.client.exceptions.BadBindException;
 import com.dlwhi.client.exceptions.NoSuchEventException;
-import com.dlwhi.client.model.Command;
-import com.dlwhi.client.view.Call;
+import com.dlwhi.Command;
+import com.dlwhi.Call;
 import com.dlwhi.client.view.Context;
 import com.dlwhi.client.view.Menu;
 

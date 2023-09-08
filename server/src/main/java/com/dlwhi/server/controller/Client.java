@@ -9,6 +9,8 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Map;
 
+import com.dlwhi.Call;
+import com.dlwhi.Command;
 import com.dlwhi.JSONPackage;
 import com.dlwhi.server.models.User;
 import com.dlwhi.server.services.ChatService;
@@ -53,17 +55,20 @@ public class Client extends Thread implements Closeable {
     @Override
     public void run() {
         try {
-            while (true) {
-                JSONPackage data = JSONPackage.fromString(in.readLine());
-                // TODO client factory
-                // Call event = events.get(data.getAsString("command"));
-                // if (event != null) {
-                //     event.invoke(data);
-                // }
-                if (data.getAsString("command").equals("sign_in")) {
-                    login(data);
-                } else if (data.getAsString("command").equals("sign_up")) {
-                    register(data);
+            while (!connection.isClosed()) {
+                String source = in.readLine();
+                if (source != null) {
+                    JSONPackage data = JSONPackage.fromString(source);
+                    // TODO client factory
+                    // Call event = events.get(data.getAsString("command"));
+                    // if (event != null) {
+                    //     event.invoke(data);
+                    // }
+                    if (data.getAsString("command").equals("sign_in")) {
+                        login(data);
+                    } else if (data.getAsString("command").equals("sign_up")) {
+                        register(data);
+                    }
                 }
             }
         } catch (IOException e) {

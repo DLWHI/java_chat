@@ -1,4 +1,4 @@
-package com.dlwhi.client.view;
+package com.dlwhi;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,7 +46,7 @@ public class Call {
         return (method == null) ? null : new Call(target, method);
     }
 
-    void invoke(Object... args) {
+    public void invoke(Object... args) {
         try {
             method.invoke(target, args);
         } catch (IllegalAccessException e) {
@@ -73,15 +73,15 @@ public class Call {
     }
 
     // Return array to store parameters
-    Object[] getParameterArray() {
+    public Object[] getParameterArray() {
         return new Object[method.getParameterCount()];
     }
 
-    void setParamaterName(int index, String name) {
+    public void setParamaterName(int index, String name) {
         paramNames[index] = name;
     }
 
-    String getParameterName(int index) {
+    public String getParameterName(int index) {
         return paramNames[index];
     }
 }

@@ -1,5 +1,7 @@
 package com.dlwhi.client.view;
 
+import com.dlwhi.Call;
+
 public interface Context {
     void show();
     String dispatchInput();

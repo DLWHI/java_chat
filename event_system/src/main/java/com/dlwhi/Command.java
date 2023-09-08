@@ -1,4 +1,4 @@
-package com.dlwhi.server.controller;
+package com.dlwhi;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Command {
     String value();
+    String[] context() default {};
     String[] parameters() default {};
 }
