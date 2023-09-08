@@ -103,6 +103,8 @@ public class Client extends Thread implements Closeable {
             try {
                 out.close();
                 in.close();
+                connection.shutdownInput();
+                connection.shutdownOutput();
                 connection.close();
             } catch (IOException e) {
                 System.err.println("Unexpected IOException");
