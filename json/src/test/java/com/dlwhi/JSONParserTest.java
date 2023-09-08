@@ -1,6 +1,9 @@
 package com.dlwhi;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,12 +39,26 @@ public class JSONParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource()
-    public void fromFiles() {
-
+    @ValueSource(strings = {
+        "/array.json",
+        "/combined.json",
+        "/nested.json",
+        "/one_line.json",
+        "/valid_multitype.json",
+        "/valid.json"
+    })
+    public void fromFiles(String jsonFile) {
+        final String jsonString = readFile(jsonFile);
+        JSONPackage json = assertDoesNotThrow(() -> JSONPackage.fromString(jsonString));
+        assertEquals(jsonString.replaceAll("\\s+", ""), json.toString());
     }
 
-    private String readFile() {
-        
+    private String readFile(String file) {
+        String content = null;
+        try (Scanner reader = new Scanner(getClass().getResourceAsStream(file))) {
+            reader.useDelimiter("\\Z");  
+            content = reader.next();
+        }
+        return content;
     }
 }

@@ -2,8 +2,10 @@ package com.dlwhi;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -23,30 +25,43 @@ public class JSONPackage {
     }
 
     // TODO add array handling
+    // TODO move this to json builder
     public static JSONPackage fromString(String source) throws InvalidJSONException {
         JSONPackage root = new JSONPackage();
         int depth = 1;
-        try (Scanner parser = new Scanner(source)) {
-            parser.useDelimiter("(?:[\r\n:,\\\"]| \\\")+").skip("\\{");
+        try (Scanner parser = getJSONReader(source)) {
             JSONPackage current = root;
+            Queue<String> queue = new LinkedList<>();
             while(depth != 0) {
-                if (parser.hasNext("\\{")) {
-                    JSONPackage child = new JSONPackage(current);
-                    current = child;
-                    ++depth;
-                    parser.skip("\\{");
-                } else if (parser.hasNext("\\}")) {
+                String element = parser.next();
+                if (element.charAt(0) == '{') {
+                    current = current.dive(element);
+                    depth++;
+                } else if (element.charAt(0) == '}') {
                     current = current.getParent();
-                    --depth;
-                    parser.skip("[ ,\n\r\"]*\\}");
-                } else if (parser.hasNext()) {
-                    current.add(parser.next(), parser.next());
+                    depth--;
+                } else {
+                    if (queue.size() == 1) {
+                        current.add(queue.poll(), element);
+                    } else {
+                        queue.add(element);
+                    }
                 }
             }
         } catch (NoSuchElementException e) {
             throw new InvalidJSONException(e.getMessage());
         }
         return root;
+    }
+
+    private static Scanner getJSONReader(String source) {
+        return new Scanner(source).useDelimiter("[\\s,\":]+").skip("\\{");
+    }
+
+    private JSONPackage dive(String childName) {
+        JSONPackage child = new JSONPackage(this);
+        add(childName, child);
+        return child;
     }
 
     public JSONPackage add(String param, Object value) {
@@ -78,12 +93,22 @@ public class JSONPackage {
         Map.Entry<String, Object> entry;
         if (i.hasNext()) {
             entry = i.next();
-            json += "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"";
+            json += "\"" + entry.getKey() + "\":";
+            if (entry.getValue() instanceof Number) {
+                json += entry.getValue().toString();
+            } else {
+                json += "\"" + entry.getValue().toString() + "\"";
+            }
         }
         while (i.hasNext()) {
             entry = i.next();
             json += ",";
-            json += "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"";
+            json += "\"" + entry.getKey() + "\":";
+            if (entry.getValue() instanceof Number) {
+                json += entry.getValue().toString();
+            } else {
+                json += "\"" + entry.getValue().toString() + "\"";
+            }
         }
         return json + "}";
     }
