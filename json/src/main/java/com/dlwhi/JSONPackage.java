@@ -2,11 +2,7 @@ package com.dlwhi;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Scanner;
 import java.util.Set;
 
 public class JSONPackage {
@@ -24,46 +20,6 @@ public class JSONPackage {
         args.put(param, value);
     }
 
-    // TODO add array handling
-    // TODO move this to json builder
-    public static JSONPackage fromString(String source) throws InvalidJSONException {
-        JSONPackage root = new JSONPackage();
-        int depth = 1;
-        try (Scanner parser = getJSONReader(source)) {
-            JSONPackage current = root;
-            Queue<String> queue = new LinkedList<>();
-            while(depth != 0) {
-                String element = parser.next();
-                if (element.charAt(0) == '{') {
-                    current = current.dive(element);
-                    depth++;
-                } else if (element.charAt(0) == '}') {
-                    current = current.getParent();
-                    depth--;
-                } else {
-                    if (queue.size() == 1) {
-                        current.add(queue.poll(), element);
-                    } else {
-                        queue.add(element);
-                    }
-                }
-            }
-        } catch (NoSuchElementException e) {
-            throw new InvalidJSONException(e.getMessage());
-        }
-        return root;
-    }
-
-    private static Scanner getJSONReader(String source) {
-        return new Scanner(source).useDelimiter("[\\s,\":]+").skip("\\{");
-    }
-
-    private JSONPackage dive(String childName) {
-        JSONPackage child = new JSONPackage(this);
-        add(childName, child);
-        return child;
-    }
-
     public JSONPackage add(String param, Object value) {
         args.put(param, value);
         return this;
@@ -77,12 +33,21 @@ public class JSONPackage {
         return args.get(param).toString()   ;
     }
 
-    public int getAsInt(String param) {
-        return Integer.valueOf(getAsInt(param));
+    public <T> T getAs(String param, Class<T> type) {
+        Object target = args.get(param);
+        if (target == null && !type.isInstance(target)) {
+            return null;
+        }
+        return type.cast(target);
     }
 
     public JSONPackage getParent() {
         return parent;
+    }
+
+    public JSONPackage clear() {
+        args.clear();
+        return this;
     }
 
     @Override
