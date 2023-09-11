@@ -20,6 +20,10 @@ public class JSONPackage {
         args.put(param, value);
     }
 
+    public static JSONPackage fromString(String source) {
+        return JSONBuilder.parseString(source);
+    }
+
     public JSONPackage add(String param, Object value) {
         args.put(param, value);
         return this;

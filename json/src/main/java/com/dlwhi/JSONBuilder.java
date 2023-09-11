@@ -1,58 +1,88 @@
 package com.dlwhi;
 
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Scanner;
+import java.nio.BufferUnderflowException;
+import java.nio.CharBuffer;
+import java.text.DecimalFormatSymbols;
 
 public class JSONBuilder {
-    private enum state {
-        KEY,
-        VALUE
-    }
-
-    private int depth = 1;
-    private JSONPackage root = new JSONPackage();
-
+    private static char cursor;
+    private static CharBuffer sourceView;
     // TODO add array handling
     // TODO move this to json builder
-    public JSONPackage parseString(String source) {
-        reset();
-        try (Scanner parser = getJSONReader(source)) {
-            JSONPackage current = root;
-            while(depth != 0) {
-                Object element = parser.next();
-                
+    public static JSONPackage parseString(String source) {
+        if (!source.startsWith("{")) {
+            throw new InvalidJSONException("Expected json object at the start");            
+        }
+        int depth = 1;
+        JSONPackage root = new JSONPackage();
+        JSONPackage current = root;
+        sourceView = CharBuffer.wrap(source);
+        cursor = sourceView.get();
+        while (sourceView.position() != sourceView.limit()) {
+            while (Character.isWhitespace((cursor = sourceView.get())));
+            if (cursor == '}') {
+                current = current.getParent();
             }
-        } catch (NoSuchElementException e) {
-            throw new InvalidJSONException(e.getMessage());
+            String key = getKey();
+            if ((cursor = sourceView.get()) != ':') {
+                throw new InvalidJSONException("Expected \":\" char after key");
+            }
+            Object value = getValue(current);
+            current.add(key, value);
+            entryCleanUp();
         }
         return root;
     }
 
-    public Object next() {
-        
+    private static String getKey() {
+        CharBuffer start = sourceView.slice();
+        int startInd = sourceView.position();
+        while ((cursor = sourceView.get()) != '\"');
+        return start.limit(sourceView.position() - startInd - 1).toString();
     }
 
-    public void reset() {
-        depth = 1;
-        root.clear();
-        queue.clear();;
+    private static Object getValue(JSONPackage parent) {
+        while (Character.isWhitespace((cursor = sourceView.get())));
+        CharBuffer start = sourceView.slice();
+        int startInd = sourceView.position();
+        if (cursor != '\"') {
+            return getNumeric();
+        } else if (cursor == '{') {
+            return new JSONPackage(parent);
+        } else {
+            while ((cursor = sourceView.get()) != '\"');
+            cursor = sourceView.get();
+            return start.limit(sourceView.position() - startInd - 2).toString();
+        }
     }
 
-    private static Scanner getJSONReader(String source) {
-        return new Scanner(source).skip("\\{");
+    private static Object getNumeric() {
+        double num = cursor - '0';
+        while (Character.isDigit((cursor = sourceView.get()))) {
+            num = num*10 + cursor - '0';
+        }
+        if ((cursor = sourceView.get()) == DecimalFormatSymbols.getInstance().getDecimalSeparator()) {
+            
+        }
+        return null;
     }
 
-    private JSONPackage dive(String childName, JSONPackage current) {
+    private static void entryCleanUp() {
+        if (Character.isWhitespace(cursor)) {
+            while (Character.isWhitespace((cursor = sourceView.get())));
+        }
+        if (cursor != ',') {
+            throw new InvalidJSONException("Expected entries to be separated by comma");
+        }
+    }
+
+    private static JSONPackage dive(String childName, JSONPackage current) {
         JSONPackage child = new JSONPackage(current);
         current.add(childName, child);
-        depth++;
         return child;
     }
 
-    private JSONPackage rise(JSONPackage current) {
-        depth--;
+    private static JSONPackage rise(JSONPackage current) {
         return current.getParent();
     }
 
