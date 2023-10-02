@@ -37,6 +37,11 @@ public class JSONPackage {
         return args.get(param).toString()   ;
     }
 
+    // unsafe
+    public int getAsInt(String param) {
+        return (int)args.get(param);
+    }
+
     public <T> T getAs(String param, Class<T> type) {
         Object target = args.get(param);
         if (target == null && !type.isInstance(target)) {
