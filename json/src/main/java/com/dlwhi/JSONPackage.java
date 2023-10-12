@@ -54,6 +54,14 @@ public class JSONPackage {
         return parent;
     }
 
+    public JSONPackage getChild(String key) {
+        Object child = args.get(key);
+        if (child instanceof JSONPackage && child != null) {
+            return (JSONPackage) child;
+        }
+        return null;
+    }
+
     public JSONPackage clear() {
         args.clear();
         return this;

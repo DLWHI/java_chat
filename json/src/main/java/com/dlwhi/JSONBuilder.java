@@ -19,6 +19,9 @@ public class JSONBuilder {
         sourceView = CharBuffer.wrap(source);
         cursor = sourceView.get();
         while (sourceView.position() != sourceView.limit()) {
+            if (cursor == '}') {
+                current = current.getParent();
+            }
             while (Character.isWhitespace((cursor = sourceView.get())));
             String key = getKey();
             if ((cursor = sourceView.get()) != ':') {
@@ -26,8 +29,8 @@ public class JSONBuilder {
             }
             Object value = getValue(current);
             current.add(key, value);
-            if (cursor == '}') {
-                current = current.getParent();
+            if (value instanceof JSONPackage) {
+                current = current.getChild(key);
             }
             entryCleanUp();
         }
@@ -45,10 +48,10 @@ public class JSONBuilder {
         while (Character.isWhitespace((cursor = sourceView.get())));
         CharBuffer start = sourceView.slice();
         int startInd = sourceView.position();
-        if (cursor != '\"') {
-            return getNumeric();
-        } else if (cursor == '{') {
+        if (cursor == '{') {
             return new JSONPackage(parent);
+        } else if (cursor != '\"') {
+            return getNumeric();
         } else {
             while ((cursor = sourceView.get()) != '\"');
             cursor = sourceView.get();
@@ -68,6 +71,7 @@ public class JSONBuilder {
                 num = num*10 + cursor - '0';
                 mantissa *= 10;
             }
+            num /= mantissa;
         }
         if (mantissa == 0) {
             return (int) num;
@@ -79,26 +83,8 @@ public class JSONBuilder {
         if (Character.isWhitespace(cursor)) {
             while (Character.isWhitespace((cursor = sourceView.get())));
         }
-        if (cursor != ',' && cursor != '}') {
+        if (cursor != ',' && cursor != '}' && cursor != '{') {
             throw new InvalidJSONException("Expected entries to be separated by comma");
         }
-    }
-
-    private static JSONPackage dive(String childName, JSONPackage current) {
-        JSONPackage child = new JSONPackage(current);
-        current.add(childName, child);
-        return child;
-    }
-
-    private static JSONPackage rise(JSONPackage current) {
-        return current.getParent();
-    }
-
-    private void queue(String element, JSONPackage current) {
-        // if (queue.size() == 1) {
-        //     current.add(queue.poll(), element);
-        // } else {
-        //     queue.add(element);
-        // }
     }
 }
