@@ -20,15 +20,15 @@ public class JSONBuilder {
         cursor = sourceView.get();
         while (sourceView.position() != sourceView.limit()) {
             while (Character.isWhitespace((cursor = sourceView.get())));
-            if (cursor == '}') {
-                current = current.getParent();
-            }
             String key = getKey();
             if ((cursor = sourceView.get()) != ':') {
                 throw new InvalidJSONException("Expected \":\" char after key");
             }
             Object value = getValue(current);
             current.add(key, value);
+            if (cursor == '}') {
+                current = current.getParent();
+            }
             entryCleanUp();
         }
         return root;
@@ -58,20 +58,28 @@ public class JSONBuilder {
 
     private static Object getNumeric() {
         double num = cursor - '0';
+        double mantissa = 0;
         while (Character.isDigit((cursor = sourceView.get()))) {
             num = num*10 + cursor - '0';
         }
-        if ((cursor = sourceView.get()) == DecimalFormatSymbols.getInstance().getDecimalSeparator()) {
-            
+        if (cursor == '.') {
+            mantissa = 1;
+            while (Character.isDigit((cursor = sourceView.get()))) {
+                num = num*10 + cursor - '0';
+                mantissa *= 10;
+            }
         }
-        return null;
+        if (mantissa == 0) {
+            return (int) num;
+        }
+        return num;
     }
 
     private static void entryCleanUp() {
         if (Character.isWhitespace(cursor)) {
             while (Character.isWhitespace((cursor = sourceView.get())));
         }
-        if (cursor != ',') {
+        if (cursor != ',' && cursor != '}') {
             throw new InvalidJSONException("Expected entries to be separated by comma");
         }
     }
