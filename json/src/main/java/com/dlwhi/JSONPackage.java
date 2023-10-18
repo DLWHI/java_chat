@@ -78,6 +78,8 @@ public class JSONPackage {
             json += "\"" + entry.getKey() + "\":";
             if (entry.getValue() instanceof Number) {
                 json += entry.getValue().toString();
+            } else if (entry.getValue() instanceof JSONPackage) {
+                json += entry.getValue().toString();
             } else {
                 json += "\"" + entry.getValue().toString() + "\"";
             }
@@ -87,6 +89,8 @@ public class JSONPackage {
             json += ",";
             json += "\"" + entry.getKey() + "\":";
             if (entry.getValue() instanceof Number) {
+                json += entry.getValue().toString();
+            } else if (entry.getValue() instanceof JSONPackage) {
                 json += entry.getValue().toString();
             } else {
                 json += "\"" + entry.getValue().toString() + "\"";

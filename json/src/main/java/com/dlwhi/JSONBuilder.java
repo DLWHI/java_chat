@@ -2,7 +2,6 @@ package com.dlwhi;
 
 import java.nio.BufferUnderflowException;
 import java.nio.CharBuffer;
-import java.text.DecimalFormatSymbols;
 
 public class JSONBuilder {
     private static char cursor;
@@ -13,27 +12,34 @@ public class JSONBuilder {
         if (!source.startsWith("{")) {
             throw new InvalidJSONException("Expected json object at the start");            
         }
-        int depth = 1;
         JSONPackage root = new JSONPackage();
         JSONPackage current = root;
         sourceView = CharBuffer.wrap(source);
         cursor = sourceView.get();
-        while (sourceView.position() != sourceView.limit()) {
-            if (cursor == '}') {
-                current = current.getParent();
+        try {
+            while (sourceView.position() != sourceView.limit()) {
+                if (cursor == '}') {
+                    current = current.getParent();
+                    cursor = sourceView.get();
+                } else {
+                    while (Character.isWhitespace((cursor = sourceView.get())));
+                    String key = getKey();
+                    if ((cursor = sourceView.get()) != ':') {
+                        throw new InvalidJSONException("Expected \":\" char after key");
+                    }
+                    Object value = getValue(current);
+                    current.add(key, value);
+                    if (value instanceof JSONPackage) {
+                        current = current.getChild(key);
+                    }
+                }
+                entryCleanUp();
             }
-            while (Character.isWhitespace((cursor = sourceView.get())));
-            String key = getKey();
-            if ((cursor = sourceView.get()) != ':') {
-                throw new InvalidJSONException("Expected \":\" char after key");
-            }
-            Object value = getValue(current);
-            current.add(key, value);
-            if (value instanceof JSONPackage) {
-                current = current.getChild(key);
-            }
-            entryCleanUp();
+        } catch (BufferUnderflowException e) {
+            
+            throw new InvalidJSONException("Unexpected end of json at token" + cursor);
         }
+        sourceView = null;
         return root;
     }
 

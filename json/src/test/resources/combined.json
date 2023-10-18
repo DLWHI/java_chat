@@ -10,6 +10,7 @@
     ],
     "entry": "entry",
     "integer": 23,
+    "double": 23.3,
     "object": {
         "entry1": "one",
         "entry2": 2,
