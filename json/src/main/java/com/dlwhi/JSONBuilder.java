@@ -2,6 +2,7 @@ package com.dlwhi;
 
 import java.nio.BufferUnderflowException;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
 
 public class JSONBuilder {
     private static char cursor;
@@ -56,6 +57,8 @@ public class JSONBuilder {
         int startInd = sourceView.position();
         if (cursor == '{') {
             return new JSONPackage(parent);
+        } else if (cursor == '[') {
+            return getArray(parent);
         } else if (cursor != '\"') {
             return getNumeric();
         } else {
@@ -63,6 +66,14 @@ public class JSONBuilder {
             cursor = sourceView.get();
             return start.limit(sourceView.position() - startInd - 2).toString();
         }
+    }
+
+    private static Object getArray(JSONPackage parent) {
+        ArrayList<Object> arr = new ArrayList<>();
+        while (cursor != ']') {
+            arr.add(getValue(parent));
+        }
+        return arr;
     }
 
     private static Object getNumeric() {
