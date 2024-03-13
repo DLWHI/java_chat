@@ -1,4 +1,5 @@
 {
+    "entry": "entry",
     "array": [
         "one",
         "tho",
@@ -8,11 +9,15 @@
         6,
         7
     ],
-    "entry": "entry",
-    "integer": 23,
     "double": 23.3,
+    "integer": 23,
     "object": {
         "entry1": "one",
+        "array": [
+            1,
+            2,
+            3
+        ],
         "entry2": 2,
         "object": {
             "entry1": "one",

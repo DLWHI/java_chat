@@ -17,7 +17,7 @@ public class JSONParserTest {
             "\"entry2\":\"data2\",\n" +
             "\"entry3\":\"data3\"\n" +
         "}";
-        JSONPackage parsed = JSONPackage.fromString(json);
+        JSONObject parsed = JSONObject.fromString(json);
         String toStringExpected = "{\"entry1\":\"data1\",\"entry2\":\"data2\",\"entry3\":\"data3\"}";
         assertEquals(toStringExpected, parsed.toString());
         assertEquals("data1", parsed.get("entry1").toString());
@@ -28,11 +28,19 @@ public class JSONParserTest {
     @Test
     public void classic() {
         String json = "{\"entry1\":\"data1\",\"entry2\":\"data2\",\"entry3\":\"data3\"}";
-        JSONPackage parsed = JSONPackage.fromString(json);
+        JSONObject parsed = JSONObject.fromString(json);
         assertEquals(json, parsed.toString());
         assertEquals("data1", parsed.get("entry1").toString());
         assertEquals("data2", parsed.get("entry2").toString());
         assertEquals("data3", parsed.get("entry3").toString());
+    }
+
+    @Test
+    public void empty() {
+        String json = "{}";
+        JSONObject parsed = JSONObject.fromString(json);
+        assertEquals(json, parsed.toString());
+        assertEquals(0, parsed.size());
     }
 
     @ParameterizedTest
@@ -46,7 +54,7 @@ public class JSONParserTest {
     })
     public void fromFiles(String jsonFile) {
         final String jsonString = readFile(jsonFile);
-        JSONPackage json = assertDoesNotThrow(() -> JSONPackage.fromString(jsonString));
+        JSONObject json = assertDoesNotThrow(() -> JSONObject.fromString(jsonString));
         assertEquals(jsonString.replaceAll("\\s+", ""), json.toString());
     }
 
