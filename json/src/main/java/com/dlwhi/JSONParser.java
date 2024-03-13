@@ -39,6 +39,5 @@ public class JSONParser {
         } else {
             current.add(key, JSONLexer.stripValue(stringValue));
         }
-        System.out.println(key + " " + stringValue);
     }
 }
