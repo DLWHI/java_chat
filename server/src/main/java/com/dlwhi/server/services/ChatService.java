@@ -1,15 +1,12 @@
 package com.dlwhi.server.services;
 
-import org.springframework.stereotype.Component;
-
 import com.dlwhi.server.models.User;
 import com.dlwhi.server.repositories.UserRepository;
 
-@Component
 public class ChatService implements UserService {
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
 
-    public void setUserRepo(UserRepository userRepo) {
+    public ChatService(UserRepository userRepo) {
         this.userRepo = userRepo;
     }
 
@@ -24,10 +21,7 @@ public class ChatService implements UserService {
 
     @Override
     public boolean register(String username, String password) {
-        User user = userRepo.save(new User(username, password));
-        if (user == null) {
-            return false;
-        }
+        userRepo.save(new User(null, username, password));
         return true;
     }
 }

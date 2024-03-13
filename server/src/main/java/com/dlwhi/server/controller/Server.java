@@ -2,10 +2,11 @@ package com.dlwhi.server.controller;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import com.dlwhi.server.services.ChatService;
 @PropertySource("classpath:config/com/dlwhi/server.cfg")
 public class Server {
     @Autowired
+    @Qualifier("chatService")
     private final ChatService service = null;
 
     @Value("${server.port}")
@@ -23,7 +25,7 @@ public class Server {
 
     private boolean exited = false;
 
-    private List<Client> clients = new LinkedList<>();
+    private List<Client> clients = new ArrayList<>();
 
     public int exec() {
         Thread shutdownListener = new Thread(() -> {
@@ -41,7 +43,7 @@ public class Server {
                 Socket socket = server.accept();
                 Client connected = new Client(socket, service);
                 clients.add(connected);
-                connected.start();;
+                connected.start();
                 System.out.println("Active connections: " + clients.size());
             }
         } catch (Exception e) {

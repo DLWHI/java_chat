@@ -1,4 +1,5 @@
 package com.dlwhi.server.config;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import com.dlwhi.server.controller.Server;
 import com.dlwhi.server.repositories.TemplateUserRepository;
 import com.dlwhi.server.repositories.UserRepository;
 import com.dlwhi.server.services.ChatService;
+import com.dlwhi.server.services.UserService;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
@@ -28,15 +30,6 @@ public class ServerConfig {
     @Value("${db.driver.name}")
     private String dbDriver;
 
-    @Autowired
-    @Qualifier("server")
-    private Server server;
-
-    @Bean
-    public Server serverInstance() {
-        return server;
-    }
-
     @Bean
     public DataSource dataSourceHikari() {
         HikariDataSource dataSource = new HikariDataSource();
@@ -48,14 +41,14 @@ public class ServerConfig {
     }
 
     @Bean
-    public ChatService chatService() {
-        ChatService service = new ChatService();
-        service.setUserRepo(userRepository(dataSourceHikari()));
-        return service;
+    @Autowired
+    public ChatService chatService(@Qualifier("templateUserRepository") UserRepository repo) {
+        return new ChatService(repo);
     }
 
     @Bean
-    public UserRepository userRepository(DataSource ds) {
+    @Autowired
+    public TemplateUserRepository templateUserRepository(@Qualifier("dataSourceHikari") DataSource ds) {
         return new TemplateUserRepository(ds);
     }
 }

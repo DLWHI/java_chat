@@ -1,14 +1,6 @@
 package com.dlwhi.server.models;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
-public class User implements DatabaseModel {
-    private static final String tableName = "users";
-    
+public class User {
     private Long id;
     private String username;
     private String password;
@@ -16,30 +8,34 @@ public class User implements DatabaseModel {
     public User() {
     }
 
-    public User(String username, String password) {
+    public User(Long id, String username, String password) {
+        this.id = id;
         this.username = username;
         this.password = password;
     }
-
-    public void fromResultSet(ResultSet queryResult) 
-            throws SQLException {
-        id = queryResult.getLong("id");
-        username = queryResult.getString("username");
-        password = queryResult.getString("password");
+    
+    public Long getId() {
+        return id;
     }
 
-    public SqlParameterSource getParamSource() {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        if (id != null) {
-            params.addValue(tableName + ".id", id);
-        }
-        params.addValue(tableName + ".username", username);
-        params.addValue(tableName + ".password", password);
-        return params;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
         return username;
+    }
+    
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public boolean passwdMatches(String passwd) {

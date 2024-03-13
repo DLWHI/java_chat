@@ -7,17 +7,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.Map;
 
-import com.dlwhi.Call;
-import com.dlwhi.Command;
-import com.dlwhi.JSONPackage;
+import com.dlwhi.JSONObject;
 import com.dlwhi.server.models.User;
 import com.dlwhi.server.services.ChatService;
 
 public class Client extends Thread implements Closeable {
-    private static Map<String, Call> events;
-    
     private final Socket connection;
     private final BufferedReader in;
     private final BufferedWriter out;
@@ -48,7 +43,7 @@ public class Client extends Thread implements Closeable {
     }
 
     private void response(int status, String message) throws IOException {
-        JSONPackage res = new JSONPackage("status", status).add("message", message);
+        JSONObject res = new JSONObject().add("status", status).add("message", message);
         write(res.toString());
     }
 
@@ -58,12 +53,7 @@ public class Client extends Thread implements Closeable {
             while (!connection.isClosed()) {
                 String source = in.readLine();
                 if (source != null) {
-                    JSONPackage data = JSONPackage.fromString(source);
-                    // TODO client factory
-                    // Call event = events.get(data.getAsString("command"));
-                    // if (event != null) {
-                    //     event.invoke(data);
-                    // }
+                    JSONObject data = JSONObject.fromString(source);
                     if (data.getAsString("command").equals("sign_in")) {
                         login(data);
                     } else if (data.getAsString("command").equals("sign_up")) {
@@ -77,8 +67,7 @@ public class Client extends Thread implements Closeable {
         close();
     }
 
-    @Command("sign_in")
-    private void login(JSONPackage data) throws IOException {
+    private void login(JSONObject data) throws IOException {
         user = service.login(data.getAsString("username"),data.getAsString("password"));
         if (user == null) {
             response(401, "Invalid username or password");
@@ -87,8 +76,7 @@ public class Client extends Thread implements Closeable {
         }
     }
 
-    @Command("sign_up")
-    private void register(JSONPackage data) throws IOException {
+    private void register(JSONObject data) throws IOException {
         if (service.register(data.getAsString("username"),data.getAsString("password"))) {
             response(401, "Registered new user");
         } else {

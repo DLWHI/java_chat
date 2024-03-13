@@ -11,7 +11,7 @@ public class MainServer
         try (AnnotationConfigApplicationContext ctx = 
                 new AnnotationConfigApplicationContext(ServerConfig.class)) {
             ctx.registerShutdownHook();
-            Server server = ctx.getBean("serverInstance", Server.class);
+            Server server = ctx.getBean("server", Server.class);
             server.exec();
         } catch (Exception e) {
             System.out.println(e.getMessage());
