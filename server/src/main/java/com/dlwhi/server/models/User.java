@@ -37,8 +37,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public boolean passwdMatches(String passwd) {
-        return passwd.equals(password);
-    }
 }

@@ -16,9 +16,7 @@ import com.dlwhi.server.services.ChatService;
 @Component("server")
 @PropertySource("classpath:config/com/dlwhi/server.cfg")
 public class Server {
-    @Autowired
-    @Qualifier("chatService")
-    private final ChatService service = null;
+    private final ChatService service;
 
     @Value("${server.port}")
     private int port;
@@ -26,6 +24,11 @@ public class Server {
     private boolean exited = false;
 
     private List<Client> clients = new ArrayList<>();
+
+    @Autowired
+    public Server(@Qualifier("chatService") ChatService service) {
+        this.service = service;
+    }
 
     public int exec() {
         Thread shutdownListener = new Thread(() -> {
