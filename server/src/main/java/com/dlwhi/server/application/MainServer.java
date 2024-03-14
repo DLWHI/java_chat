@@ -1,4 +1,4 @@
-package com.dlwhi.server.controller;
+package com.dlwhi.server.application;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -11,7 +11,7 @@ public class MainServer
         try (AnnotationConfigApplicationContext ctx = 
                 new AnnotationConfigApplicationContext(ServerConfig.class)) {
             ctx.registerShutdownHook();
-            Server server = ctx.getBean("server", Server.class);
+            ServerApplication server = ctx.getBean("server", ServerApplication.class);
             server.exec();
         } catch (Exception e) {
             System.out.println(e.getMessage());

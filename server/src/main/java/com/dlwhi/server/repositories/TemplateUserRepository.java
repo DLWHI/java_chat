@@ -32,7 +32,7 @@ public class TemplateUserRepository implements UserRepository {
     private final String GET_ALL_QUERY =
         "select " + COLUMN_SELECT + " from users;";
 
-    private DataSource db;
+    private final DataSource db;
 
     public TemplateUserRepository(DataSource db) {
         this.db = db;

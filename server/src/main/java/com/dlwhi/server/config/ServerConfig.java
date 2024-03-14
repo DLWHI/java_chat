@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
-import com.dlwhi.server.controller.Server;
+import com.dlwhi.server.application.ServerApplication;
+import com.dlwhi.server.client.ClientProvider;
 import com.dlwhi.server.repositories.TemplateUserRepository;
 import com.dlwhi.server.repositories.UserRepository;
 import com.dlwhi.server.services.ChatService;
@@ -19,7 +20,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @PropertySource("classpath:config/com/dlwhi/db.cfg")
-@Import(Server.class)
+@Import({ClientProvider.class, ServerApplication.class})
 public class ServerConfig {
     @Value("${db.url}")
     private String dbUrl;
