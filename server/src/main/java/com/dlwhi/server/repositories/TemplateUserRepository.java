@@ -5,6 +5,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -38,18 +39,14 @@ public class TemplateUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(Long id) {
+    public User findById(long id) throws DataAccessException {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
-        User found = null;
-        try {
-            found = query.queryForObject(
-                FIND_QUERY_ID,
-                new MapSqlParameterSource("id", id),
-                new BeanPropertyRowMapper<User>(User.class)
-            );
-        } catch (DataAccessException e) {
-        }
-        return found;
+        List<User> found = query.query(
+            FIND_QUERY_ID,
+            new MapSqlParameterSource("id", id),
+            new BeanPropertyRowMapper<User>(User.class)
+        );
+        return (found.isEmpty()) ? null : found.get(0);
     }
 
     @Override
@@ -62,48 +59,44 @@ public class TemplateUserRepository implements UserRepository {
     }
 
     @Override
-    public void save(User entity) {
+    public boolean save(User entity) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         try {
-            query.update(
+            return query.update(
                 INSERT_QUERY,
                 new MapSqlParameterSource("user", entity.getUsername())
                     .addValue("passwd", entity.getPassword())
-            );
-        } catch (DataAccessException e) {
-            System.err.println(e.getMessage());
+            ) == 1;
+        } catch (DuplicateKeyException e) {
+            return false;
         }
     }
 
     @Override
-    public void update(User entity) {
+    public boolean update(User entity) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
-        query.update(
+        return query.update(
             UPDATE_QUERY, 
             new MapSqlParameterSource("id", entity.getId())
                 .addValue("user", entity.getUsername())
                 .addValue("passwd", entity.getPassword())
-        );
+        ) == 1;
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         query.update(DELETE_QUERY, new MapSqlParameterSource("id", id));
     }
 
     @Override
-    public User findByUsername(String username) {
+    public User findByUsername(String username) throws DataAccessException {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
-        User found = null;
-        try {
-            found = query.queryForObject(
+        List<User> found = query.query(
             FIND_QUERY_USERNAME,
             new MapSqlParameterSource("user", username),
             new BeanPropertyRowMapper<User>(User.class)
         );
-        } catch (DataAccessException e) {
-        }
-        return found;
+        return (found.isEmpty()) ? null : found.get(0);
     }
 }

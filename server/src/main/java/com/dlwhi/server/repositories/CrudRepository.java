@@ -3,9 +3,9 @@ package com.dlwhi.server.repositories;
 import java.util.List;
 
 public interface CrudRepository<T> {
-    T findById(Long id);
+    T findById(long id);
     List<T> getAll();
-    void save(T entity);
-    void update(T entity);
-    void delete(Long id);
+    boolean save(T entity);
+    boolean update(T entity);
+    void delete(long id);
 }
