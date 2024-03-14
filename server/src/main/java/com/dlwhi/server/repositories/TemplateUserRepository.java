@@ -12,20 +12,24 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import com.dlwhi.server.models.User;
 
 public class TemplateUserRepository implements UserRepository {
+    private final String COLUMN_SELECT = 
+        "id as users.id, " + 
+        "username as users.username, " + 
+        "password as users.password";
 
-    private final String findQuery =
-        "select * from users where id = :id";
-    private final String findUNameQuery =
-        "select * from users where username = :user";
-    private final String insertQuery =
+    private final String FIND_QUERY_ID =
+        "select " + COLUMN_SELECT + " from users where id = :id;";
+    private final String FIND_QUERY_USERNAME =
+        "select " + COLUMN_SELECT + " from users where username = :user;";
+    private final String INSERT_QUERY =
         "insert into users(username, password) " +
-        "values(:user, :passwd)";
-    private final String updateQuery = 
-        "update users set username = :user, password = :passwd where id = :id";
-    private final String deleteQuery =
-        "delete from users where id = :id";
-    private final String getAllQuery =
-        "select id as users.id, username as users.username, password as users.password from users";
+        "values(:user, :passwd);";
+    private final String UPDATE_QUERY = 
+        "update users set username = :user, password = :passwd where id = :id;";
+    private final String DELETE_QUERY =
+        "delete from users where id = :id;";
+    private final String GET_ALL_QUERY =
+        "select " + COLUMN_SELECT + " from users;";
 
     private DataSource db;
 
@@ -39,7 +43,7 @@ public class TemplateUserRepository implements UserRepository {
         User found = null;
         try {
             found = query.queryForObject(
-                findQuery,
+                FIND_QUERY_ID,
                 new MapSqlParameterSource("id", id),
                 new BeanPropertyRowMapper<User>(User.class)
             );
@@ -52,7 +56,7 @@ public class TemplateUserRepository implements UserRepository {
     public List<User> getAll() {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.query(
-            getAllQuery,
+            GET_ALL_QUERY,
             new BeanPropertyRowMapper<User>(User.class)
         );
     }
@@ -62,7 +66,7 @@ public class TemplateUserRepository implements UserRepository {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         try {
             query.update(
-                insertQuery,
+                INSERT_QUERY,
                 new MapSqlParameterSource("user", entity.getUsername())
                     .addValue("passwd", entity.getPassword())
             );
@@ -75,7 +79,7 @@ public class TemplateUserRepository implements UserRepository {
     public void update(User entity) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         query.update(
-            updateQuery, 
+            UPDATE_QUERY, 
             new MapSqlParameterSource("id", entity.getId())
                 .addValue("user", entity.getUsername())
                 .addValue("passwd", entity.getPassword())
@@ -85,7 +89,7 @@ public class TemplateUserRepository implements UserRepository {
     @Override
     public void delete(Long id) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
-        query.update(deleteQuery, new MapSqlParameterSource("id", id));
+        query.update(DELETE_QUERY, new MapSqlParameterSource("id", id));
     }
 
     @Override
@@ -94,7 +98,7 @@ public class TemplateUserRepository implements UserRepository {
         User found = null;
         try {
             found = query.queryForObject(
-            findUNameQuery,
+            FIND_QUERY_USERNAME,
             new MapSqlParameterSource("user", username),
             new BeanPropertyRowMapper<User>(User.class)
         );
