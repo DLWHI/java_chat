@@ -3,20 +3,25 @@ package com.dlwhi.server.client;
 import java.io.IOException;
 
 import com.dlwhi.JSONObject;
+import com.dlwhi.server.models.Room;
 import com.dlwhi.server.models.User;
+import com.dlwhi.server.services.RoomService;
 import com.dlwhi.server.services.UserService;
 
 public class Client extends Thread {
 
     private final Connection conn;
     private final UserService users;
+    private final RoomService rooms;
 
     private ClientObserver clientManager;
 
     private User userData;
+    private Room currentRoom;
 
-    public Client(Connection conn, UserService users) {
+    public Client(Connection conn, UserService users, RoomService rooms) {
         this.conn = conn;
+        this.rooms = rooms;
         this.users = users;
     }
 
@@ -30,6 +35,10 @@ public class Client extends Thread {
                         login(source);
                     } else if (source.getAsString("cmd").equals("sign_up")) {
                         register(source);
+                    } else if (source.getAsString("cmd").equals("search_room")) {
+                        searchRooms(source);
+                    } else if (source.getAsString("cmd").equals("enter")) {
+                        enterRoom(source);
                     }
                 }
             }
@@ -65,18 +74,32 @@ public class Client extends Thread {
 
     private void register(JSONObject data) throws IOException {
         if (users.register(data.getAsString("username"), data.getAsString("password"))) {
-            conn.respondMessage(200, "Registered new user");
+            conn.respond(200);
         } else {
-            conn.respondMessage(401, "User exists");
+            conn.respond(401);
         }
     }
 
     private void login(JSONObject data) throws IOException {
         userData = users.login(data.getAsString("username"), data.getAsString("password"));
         if (userData == null) {
-            conn.respondMessage(401, "Invalid username or password");
+            conn.respond(401);
         } else {
-            conn.respondMessage(200, "Successful login");
+            conn.respond(200);
+        }
+    }
+
+    private void searchRooms(JSONObject data) throws IOException {
+        Room[] found = rooms.find(data.getAsString("room_name")).toArray(new Room[0]);
+        conn.respond(200, new JSONObject().add("rooms", found));
+    }
+
+    private void enterRoom(JSONObject data) throws IOException {
+        currentRoom = rooms.find(data.getAsInt("room_id"));
+        if (currentRoom == null) {
+            conn.respond(200);
+        } else {
+            conn.respond(404);
         }
     }
 }

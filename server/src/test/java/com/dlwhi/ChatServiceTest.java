@@ -9,8 +9,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.dlwhi.server.models.User;
@@ -33,41 +31,33 @@ public class ChatServiceTest {
 
     @BeforeEach
     public void init(){
-        userRepo = new TemplateUserRepository(
-            new EmbeddedDatabaseBuilder()
-                .generateUniqueName(true)
-                .setType(EmbeddedDatabaseType.HSQL)
-                .setScriptEncoding("UTF-8")
-                .addScript("/schema.sql")
-                .addScript("/data.sql")
-                .build()
-            );
+        userRepo = new TemplateUserRepository(EmbeddedDBProvider.get());
     }
 
     @Test
     public void loginSuccess() {
-        ChatService testSubject = new ChatService(userRepo, encoderMock);
+        ChatService testSubject = new ChatService(userRepo, null, encoderMock);
         User logon = testSubject.login("Endel", "lxgiwyl;");
         assertNotNull(logon);
     }
 
     @Test
     public void loginWrongPasswd() {
-        ChatService testSubject = new ChatService(userRepo, encoderMock);
+        ChatService testSubject = new ChatService(userRepo, null, encoderMock);
         User logon = testSubject.login("Endel", "lxgwyl");
         assertNull(logon);
     }
 
     @Test
     public void loginWrongUser() {
-        ChatService testSubject = new ChatService(userRepo, encoderMock);
+        ChatService testSubject = new ChatService(userRepo, null, encoderMock);
         User logon = testSubject.login("Endl", "lxgiwyl");
         assertNull(logon);
     }
 
     @Test
     public void registerSuccess() {
-        ChatService testSubject = new ChatService(userRepo);
+        ChatService testSubject = new ChatService(userRepo, null);
         assertTrue(testSubject.register("me", "passwd"));
         User logon = testSubject.login("me", "passwd");
         assertNotNull(logon);
@@ -75,7 +65,7 @@ public class ChatServiceTest {
 
     @Test
     public void registerExisting() {
-        ChatService testSubject = new ChatService(userRepo);
+        ChatService testSubject = new ChatService(userRepo, null);
         assertFalse(testSubject.register("John", "passwd"));
     }
 }

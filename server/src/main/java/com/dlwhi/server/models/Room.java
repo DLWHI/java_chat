@@ -1,14 +1,20 @@
 package com.dlwhi.server.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Room {
-    private long id;
+    private Long id;
     private String name;
-    private User owner;
+    private Long ownerId;
 
-    public long getId() {
+    public Room() {
+    }
+
+    public Room(Long id, String name, Long ownerId) {
+        this.id = id;
+        this.name = name;
+        this.ownerId = ownerId;
+    }
+
+    public Long getId() {
         return id;
     }
 
@@ -24,11 +30,16 @@ public class Room {
         this.name = name;
     }
 
-    public User getOwner() {
-        return owner;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setOwnerId(Long owner) {
+        this.ownerId = owner;
+    }
+
+    @Override
+    public String toString() {
+        return "Room [id=" + id + ", name=" + name + ", ownerId=" + ownerId + "]";
     }
 }

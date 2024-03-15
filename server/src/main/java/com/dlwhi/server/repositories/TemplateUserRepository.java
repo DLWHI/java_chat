@@ -5,7 +5,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -67,7 +67,7 @@ public class TemplateUserRepository implements UserRepository {
                 new MapSqlParameterSource("user", entity.getUsername())
                     .addValue("passwd", entity.getPassword())
             ) == 1;
-        } catch (DuplicateKeyException e) {
+        } catch (DataIntegrityViolationException e) {
             return false;
         }
     }

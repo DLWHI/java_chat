@@ -4,3 +4,10 @@ VALUES('John', 'jklwyl'),
     ('Maxwell', 'd4rkn355'),
     ('Endel', 'lxgiwyl;'),
     ('Wyatt', 'drop database users');
+
+INSERT INTO rooms(name) 
+VALUES('Domik ebli'),
+    ('Rofl and Dance school'),
+    ('untermenschi'),
+    ('untermenschi'),
+    ('kulturisti');

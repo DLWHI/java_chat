@@ -64,13 +64,13 @@ public class ClientConnection implements Connection {
     }
 
     @Override
-    public void message(String message) throws IOException {
-        write(new JSONObject().add("message", message).toString());
+    public void respond(int status) throws IOException {
+        write("{\"status\":" + status + "}");
     }
 
     @Override
-    public void respondMessage(int status, String message) throws IOException {
-        respond(status, new JSONObject().add("message", message));
+    public void message(String message) throws IOException {
+        write("{\"message\":\"" + message + "\"}");
     }
 
     @Override

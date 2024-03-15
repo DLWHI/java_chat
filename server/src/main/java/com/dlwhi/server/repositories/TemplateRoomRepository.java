@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -12,23 +14,23 @@ import com.dlwhi.server.models.Room;
 
 public class TemplateRoomRepository implements RoomRepository {
     private final String COLUMN_SELECT = 
-        "id as users.id, " + 
-        "username as users.username, " + 
-        "password as users.password";
+        "id as rooms.id, " + 
+        "name as rooms.name, " + 
+        "owner as rooms.ownerId";
 
     private final String FIND_QUERY_ID =
-        "select " + COLUMN_SELECT + " from users where id = :id;";
+        "select " + COLUMN_SELECT + " from rooms where id = :id;";
     private final String FIND_QUERY_USERNAME =
-        "select " + COLUMN_SELECT + " from users where username = :user;";
+        "select " + COLUMN_SELECT + " from rooms where name = :name;";
     private final String INSERT_QUERY =
-        "insert into users(username, password) " +
-        "values(:user, :passwd);";
+        "insert into rooms(name, owner) " +
+        "values(:name, :ownerId);";
     private final String UPDATE_QUERY = 
-        "update users set username = :user, password = :passwd where id = :id;";
+        "update rooms set name = :name, owner = :ownerId where id = :id;";
     private final String DELETE_QUERY =
-        "delete from users where id = :id;";
+        "delete from rooms where id = :id;";
     private final String GET_ALL_QUERY =
-        "select " + COLUMN_SELECT + " from users;";
+        "select " + COLUMN_SELECT + " from rooms;";
 
     private final DataSource db;
 
@@ -49,32 +51,51 @@ public class TemplateRoomRepository implements RoomRepository {
 
     @Override
     public List<Room> getAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        return query.query(
+            GET_ALL_QUERY,
+            new BeanPropertyRowMapper<Room>(Room.class)
+        );
     }
 
     @Override
     public boolean save(Room entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        try {
+            return query.update(
+                INSERT_QUERY,
+                new MapSqlParameterSource("name", entity.getName())
+                    .addValue("ownerId", entity.getOwnerId())
+            ) == 1;
+        } catch (DataIntegrityViolationException e) {
+            return false;
+        }
     }
 
     @Override
     public boolean update(Room entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        return query.update(
+            UPDATE_QUERY, 
+            new MapSqlParameterSource("id", entity.getId())
+                .addValue("name", entity.getName())
+                .addValue("ownerId", entity.getOwnerId())
+        ) == 1;
     }
 
     @Override
     public void delete(long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        query.update(DELETE_QUERY, new MapSqlParameterSource("id", id));
     }
 
     @Override
-    public List<Room> findByName(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByName'");
+    public List<Room> findByName(String name) throws DataAccessException {
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        return query.query(
+            FIND_QUERY_USERNAME,
+            new MapSqlParameterSource("name", name),
+            new BeanPropertyRowMapper<Room>(Room.class)
+        );
     }
-    
 }

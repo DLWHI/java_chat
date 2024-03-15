@@ -12,16 +12,17 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.dlwhi.server.application.ServerApplication;
 import com.dlwhi.server.client.ClientProvider;
+import com.dlwhi.server.repositories.RoomRepository;
+import com.dlwhi.server.repositories.TemplateRoomRepository;
 import com.dlwhi.server.repositories.TemplateUserRepository;
 import com.dlwhi.server.repositories.UserRepository;
 import com.dlwhi.server.services.ChatService;
-import com.dlwhi.server.services.UserService;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @PropertySource("classpath:config/com/dlwhi/db.cfg")
 @Import({ClientProvider.class, ServerApplication.class})
-public class ServerConfig {
+public class ServerApplicationConfig {
     @Value("${db.url}")
     private String dbUrl;
     @Value("${db.user}")
@@ -43,13 +44,22 @@ public class ServerConfig {
 
     @Bean
     @Autowired
-    public ChatService chatService(@Qualifier("templateUserRepository") UserRepository repo) {
-        return new ChatService(repo);
+    public ChatService chatService(
+        @Qualifier("templateUserRepository") UserRepository userRepo,
+        @Qualifier("templateUserRepository") RoomRepository roomRepo
+    ) {
+        return new ChatService(userRepo, roomRepo);
     }
 
     @Bean
     @Autowired
     public TemplateUserRepository templateUserRepository(@Qualifier("dataSourceHikari") DataSource ds) {
         return new TemplateUserRepository(ds);
+    }
+
+    @Bean
+    @Autowired
+    public TemplateRoomRepository templateRoomRepository(@Qualifier("dataSourceHikari") DataSource ds) {
+        return new TemplateRoomRepository(ds);
     }
 }
