@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import com.dlwhi.server.application.ServerApplication;
 import com.dlwhi.server.client.ClientProvider;
@@ -33,7 +36,7 @@ public class ServerApplicationConfig {
     private String dbDriver;
 
     @Bean
-    public DataSource dataSourceHikari() {
+    public HikariDataSource dataSourceHikari() {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(dbUrl);
         dataSource.setUsername(dbUser);
@@ -43,23 +46,33 @@ public class ServerApplicationConfig {
     }
 
     @Bean
+    public EmbeddedDatabase dataSourceEmbedded() {
+        return new EmbeddedDatabaseBuilder()
+                .generateUniqueName(true)
+                .setType(EmbeddedDatabaseType.HSQL)
+                .setScriptEncoding("UTF-8")
+                .addScript("/resources/schema.sql")
+                .build();
+    }
+
+    @Bean
     @Autowired
     public ChatService chatService(
         @Qualifier("templateUserRepository") UserRepository userRepo,
-        @Qualifier("templateUserRepository") RoomRepository roomRepo
+        @Qualifier("templateRoomRepository") RoomRepository roomRepo
     ) {
         return new ChatService(userRepo, roomRepo);
     }
 
     @Bean
     @Autowired
-    public TemplateUserRepository templateUserRepository(@Qualifier("dataSourceHikari") DataSource ds) {
+    public TemplateUserRepository templateUserRepository(@Qualifier("dataSourceEmbedded") DataSource ds) {
         return new TemplateUserRepository(ds);
     }
 
     @Bean
     @Autowired
-    public TemplateRoomRepository templateRoomRepository(@Qualifier("dataSourceHikari") DataSource ds) {
+    public TemplateRoomRepository templateRoomRepository(@Qualifier("dataSourceEmbedded") DataSource ds) {
         return new TemplateRoomRepository(ds);
     }
 }
