@@ -28,25 +28,23 @@ public class Client extends Thread {
     @Override
     public void run() {
         try {
-            while (!conn.isClosed()) {
-                if (conn.ready()) {
-                    JSONObject source = conn.accept();
-                    if (source.getAsString("cmd").equals("sign_in")) {
-                        login(source);
-                    } else if (source.getAsString("cmd").equals("sign_up")) {
-                        register(source);
-                    } else if (source.getAsString("cmd").equals("search_room")) {
-                        searchRooms(source);
-                    } else if (source.getAsString("cmd").equals("enter")) {
-                        enterRoom(source);
-                    }
+            JSONObject source;
+            while ((source = conn.accept()) != null) {
+                if (source.getAsString("cmd").equals("sign_in")) {
+                    login(source);
+                } else if (source.getAsString("cmd").equals("sign_up")) {
+                    register(source);
+                } else if (source.getAsString("cmd").equals("search_room")) {
+                    searchRooms(source);
+                } else if (source.getAsString("cmd").equals("enter")) {
+                    enterRoom(source);
                 }
             }
+            conn.close();
         } catch (IOException e) {
             System.err.println("Unexpected IO exception");
             System.err.println(e.getMessage() + " on " + conn);
         }
-        terminate();
         if (clientManager != null) {
             clientManager.notifyDisconnect(this);
         }
@@ -56,7 +54,6 @@ public class Client extends Thread {
         if (!conn.isClosed()) {
             try {
                 conn.message("Server is closing connection");
-                conn.close();
             } catch (IOException e) {
                 System.err.println("Unexpected IO exception occured on closing " + conn);
                 System.err.println(e.getMessage());

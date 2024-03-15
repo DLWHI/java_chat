@@ -37,16 +37,15 @@ public class ClientConnection implements Connection {
     public void close() throws IOException {
         if (!connection.isClosed()) {
             System.out.println("Closing client " + connection + "...");
+            try {
+                message("Server is closing connection");
+            } catch (IOException e) {
+            }
             out.close();
             in.close();
             connection.close();
             System.out.println("Closed client " + connection);
         }
-    }
-
-    @Override
-    public boolean ready() throws IOException {
-        return in.ready();
     }
 
     @Override
