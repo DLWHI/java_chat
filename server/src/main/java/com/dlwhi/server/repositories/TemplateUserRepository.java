@@ -62,6 +62,9 @@ public class TemplateUserRepository implements UserRepository {
 
     @Override
     public boolean save(User entity) {
+        if (entity == null || entity.getUsername() == null || entity.getPassword() == null) {
+            return false;
+        }
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         try {
             return query.update(
@@ -76,6 +79,9 @@ public class TemplateUserRepository implements UserRepository {
 
     @Override
     public boolean update(User entity) {
+        if (entity == null || entity.getUsername() == null || entity.getPassword() == null) {
+            return false;
+        }
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.update(
             UPDATE_QUERY, 

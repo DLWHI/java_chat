@@ -62,6 +62,9 @@ public class TemplateRoomRepository implements RoomRepository {
 
     @Override
     public boolean save(Room entity) {
+        if (entity == null || entity.getName() == null) {
+            return false;
+        }
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         try {
             return query.update(
@@ -76,6 +79,9 @@ public class TemplateRoomRepository implements RoomRepository {
 
     @Override
     public boolean update(Room entity) {
+        if (entity == null || entity.getName() == null || entity.getOwnerId() == null) {
+            return false;
+        }
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.update(
             UPDATE_QUERY, 

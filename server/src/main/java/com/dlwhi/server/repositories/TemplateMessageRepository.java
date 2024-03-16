@@ -5,18 +5,19 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.dlwhi.server.models.Message;
+import com.dlwhi.server.models.MessageRowMapper;
 
 public class TemplateMessageRepository implements MessageRepository {
     private final String COLUMN_SELECT = 
-        "id as message_id, " + 
-        "text as message_text, " + 
-        "author as message_author_id, " +
-        "room as message_room_id";
+        "messages.id as message_id, " + 
+        "messages.text as message_text, " + 
+        "messages.room as message_room_id, " +
+        "users.id as author_id, " +
+        "users.username as author_name ";
 
     private final String FIND_QUERY_ID =
         "select " + COLUMN_SELECT + " from messages " +
@@ -38,6 +39,14 @@ public class TemplateMessageRepository implements MessageRepository {
         "join users on users.id = messages.author;";
 
     private final DataSource db;
+    private final MessageRowMapper mapper =
+        new MessageRowMapper(
+            "message_id",
+            "message_text",
+            "message_room_id",
+            "author_id",
+            "author_name"
+        );
 
     public TemplateMessageRepository(DataSource db) {
         this.db = db;
@@ -49,7 +58,7 @@ public class TemplateMessageRepository implements MessageRepository {
         List<Message> found = query.query(
             FIND_QUERY_ID,
             new MapSqlParameterSource("id", id),
-            new BeanPropertyRowMapper<Message>(Message.class)
+            mapper
         );
         return (found.isEmpty()) ? null : found.get(0);
     }
@@ -59,12 +68,18 @@ public class TemplateMessageRepository implements MessageRepository {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.query(
             GET_ALL_QUERY,
-            new BeanPropertyRowMapper<Message>(Message.class)
+            mapper
         );
     }
 
     @Override
     public boolean save(Message entity) {
+        if (entity == null 
+            || entity.getAuthor() == null 
+            || entity.getRoomId() == null 
+            || entity.getText() == null) {
+            return false;
+        }
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         try {
             return query.update(
@@ -80,6 +95,9 @@ public class TemplateMessageRepository implements MessageRepository {
 
     @Override
     public boolean update(Message entity) {
+        if (entity == null || entity.getText() == null) {
+            return false;
+        }
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.update(
             UPDATE_QUERY, 
@@ -100,7 +118,7 @@ public class TemplateMessageRepository implements MessageRepository {
         return query.query(
             FIND_QUERY_ROOM,
             new MapSqlParameterSource("roomId", roomId),
-            new BeanPropertyRowMapper<Message>(Message.class)
+            mapper
         );
     }
     

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.dlwhi.server.models.User;
@@ -22,10 +22,11 @@ import com.dlwhi.server.repositories.TemplateUserRepository;
 
 public class TemplateUserRepoTest {
 
-    private static Stream<User> newUserProvider() {
+    private static Stream<User> saveSuccessUserProvider() {
         return Stream.of(
             new User(null, "someone", "sm"),
             new User(7l, "someone", "sm"),
+            new User(-7l, "someone", "sm"),
             new User(null, "", ""),
             new User(null, "", "lxgiwyl;"),
             new User(null, " = null; drop db users", "null"),
@@ -33,7 +34,15 @@ public class TemplateUserRepoTest {
         );
     }
 
-    private static Stream<User> updateUserProvider() {
+    private static Stream<User> saveFailUserProvider() {
+        return Stream.of(
+            new User(null, null, "sm"),
+            new User(7l, "someone", null),
+            new User(null, null, null)
+        );
+    }
+
+    private static Stream<User> updateSuccessUserProvider() {
         return Stream.of(
             new User(1l, "someone", "sm"),
             new User(1l, "Wayne", "sm"),
@@ -43,12 +52,18 @@ public class TemplateUserRepoTest {
         );
     }
 
-    private static Stream<User> failUserProvider() {
+    private static Stream<User> updateFailUserProvider() {
         return Stream.of(
-            new User(null, "John", "sm"),
+            new User(1l, null, "sm"),
+            new User(1l, "Wayne", null),
+            new User(3l, null, null),
+            new User(-2l, "", "lxgiwyl;"),
+            new User(30l, " = null; drop db users", "null"),
             new User(null, null, "sm"),
-            new User(null, "null", null),
-            new User(null, null, null)
+            new User(null, "Wayne", null),
+            new User(null, null, null),
+            new User(null, "", "lxgiwyl;"),
+            new User(null, " = null; drop db users", "null")
         );
     }
 
@@ -88,7 +103,7 @@ public class TemplateUserRepoTest {
     }
 
     @ParameterizedTest(name = "Test inserting {0} | success")
-    @MethodSource("newUserProvider")
+    @MethodSource("saveSuccessUserProvider")
     public void saveTestSuccess(User user) {
         TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
         assertTrue(testSubject.save(user));
@@ -100,20 +115,15 @@ public class TemplateUserRepoTest {
     }
 
     @ParameterizedTest(name = "Test inserting {0} | fail")
-    @MethodSource("failUserProvider")
+    @NullSource
+    @MethodSource("saveFailUserProvider")
     public void saveTestFail(User user) {
         TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
         assertFalse(testSubject.save(user));
     }
 
-    @Test
-    public void saveTestNull() {
-        TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
-        assertThrows(NullPointerException.class, () -> testSubject.save(null));
-    }
-
     @ParameterizedTest(name = "Test updating {0} | success")
-    @MethodSource("updateUserProvider")
+    @MethodSource("updateSuccessUserProvider")
     public void updateTestSuccess(User user) {
         TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
         user.setUsername("white_coral");
@@ -125,32 +135,20 @@ public class TemplateUserRepoTest {
     }
 
     @ParameterizedTest(name = "Test updating {0} | fail")
-    @MethodSource({"failUserProvider"})
+    @NullSource
+    @MethodSource({"updateFailUserProvider"})
     public void updateTestFail(User user) {
         TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
         assertFalse(testSubject.update(user));
     }
 
-    @Test
-    public void updateTestNull() {
-        TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
-        assertThrows(NullPointerException.class, () -> testSubject.update(null));
-    }
-
     @ParameterizedTest(name = "Test deleting userID {0}")
-    @ValueSource(longs = { 0, 1, 2, 3, 4 })
-    public void deleteTestExisting(long id) {
-        TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
-        testSubject.delete(id);
-        User found = testSubject.findById(id);
-        assertNull(found);
-    }
-
-    @ParameterizedTest(name = "Test deleting userID {0}")
-    @ValueSource(longs = { -1, 100, 232, 323, -323 })
-    public void deleteTestNonExisting(long id) {
+    @ValueSource(longs = { 0, 1, 2, 3, 4, -1, 100, 232, 323, -323})
+    public void deleteTest(long id) {
         TemplateUserRepository testSubject = new TemplateUserRepository(EmbeddedDBProvider.get());
         assertDoesNotThrow(() -> testSubject.delete(id));
+        User found = testSubject.findById(id);
+        assertNull(found);
     }
 
     @Test

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -16,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.dlwhi.server.models.Room;
@@ -31,7 +31,7 @@ public class TemplateRoomRepoTest {
         );
     }
 
-    private static Stream<Room> newRoomProvider() {
+    private static Stream<Room> saveSuccessRoomProvider() {
         return Stream.of(
             new Room(null, "room", 1l),
             new Room(null, "room", null),
@@ -42,18 +42,27 @@ public class TemplateRoomRepoTest {
         );
     }
 
-    private static Stream<Room> updateRoomProvider() {
+    private static Stream<Room> saveFailRoomProvider() {
+        return Stream.of(
+            new Room(null, null, 1l),
+            new Room(null, null, null)
+        );
+    }
+
+    private static Stream<Room> updateSuccessRoomProvider() {
         return Stream.of(
             new Room(1l, "room", 0l),
-            new Room(1l, "room", null),
-            new Room(1l, "", null),
             new Room(1l, "", 1l),
             new Room(1l, "drop db rooms", 1l)
         );
     }
 
-    private static Stream<Room> failRoomProvider() {
+    private static Stream<Room> updateFailRoomProvider() {
         return Stream.of(
+            new Room(1l, null, 0l),
+            new Room(1l, "room", null),
+            new Room(1l, null, null),
+            new Room(null, "room", null),
             new Room(null, null, 0l),
             new Room(null, null, null)
         );
@@ -99,7 +108,7 @@ public class TemplateRoomRepoTest {
     }
 
     @ParameterizedTest(name = "Test inserting room {0} | success")
-    @MethodSource("newRoomProvider")
+    @MethodSource("saveSuccessRoomProvider")
     public void saveTestSuccess(Room room) {
         TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
         assertTrue(testSubject.save(room));
@@ -113,20 +122,15 @@ public class TemplateRoomRepoTest {
     }
 
     @ParameterizedTest(name = "Test inserting user {0} | fail")
-    @MethodSource("failRoomProvider")
+    @NullSource
+    @MethodSource("saveFailRoomProvider")
     public void saveTestFail(Room room) {
         TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
         assertFalse(testSubject.save(room));
     }
 
-    @Test
-    public void saveTestNull() {
-        TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
-        assertThrows(NullPointerException.class, () -> testSubject.save(null));
-    }
-
     @ParameterizedTest(name = "Test updating {0} | success")
-    @MethodSource("updateRoomProvider")
+    @MethodSource("updateSuccessRoomProvider")
     public void updateTestSuccess(Room room) {
         TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
         room.setName("white_coral");
@@ -140,32 +144,20 @@ public class TemplateRoomRepoTest {
     }
 
     @ParameterizedTest(name = "Test updating {0} | fail")
-    @MethodSource({"failRoomProvider"})
+    @NullSource
+    @MethodSource({"updateFailRoomProvider"})
     public void updateTestFail(Room room) {
         TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
         assertFalse(testSubject.update(room));
     }
 
-    @Test
-    public void updateTestNull() {
-        TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
-        assertThrows(NullPointerException.class, () -> testSubject.update(null));
-    }
-
     @ParameterizedTest(name = "Test deleting roomID {0}")
-    @ValueSource(longs = {0, 1, 2, 3})
-    public void deleteTestExisting(long id) {
-        TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
-        testSubject.delete(id);
-        Room found = testSubject.findById(id);
-        assertNull(found);
-    }
-
-    @ParameterizedTest(name = "Test deleting roomID {0}")
-    @ValueSource(longs = {-1, 100, 232, 323, -323})
-    public void deleteTestNonExisting(long id) {
+    @ValueSource(longs = {0, 1, 2, 3, -1, 100, 232, 323, -323})
+    public void deleteTest(long id) {
         TemplateRoomRepository testSubject = new TemplateRoomRepository(EmbeddedDBProvider.get());
         assertDoesNotThrow(() -> testSubject.delete(id));
+        Room found = testSubject.findById(id);
+        assertNull(found);
     }
 
     @Test

@@ -11,3 +11,13 @@ VALUES('Domik ebli'),
     ('untermenschi'),
     ('untermenschi'),
     ('kulturisti');
+
+INSERT INTO messages(text, author, room)
+VALUES('text', 1, 1),
+    ('text', 1, 1),
+    ('text', 2, 3),
+    ('text', 3, 2),
+    ('text', 3, 2),
+    ('text', 1, 2),
+    ('text', 0, 2),
+    ('text', 1, 1);

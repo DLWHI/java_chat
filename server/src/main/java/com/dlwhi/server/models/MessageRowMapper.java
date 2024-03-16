@@ -9,23 +9,26 @@ public class MessageRowMapper implements RowMapper<Message> {
     private final String ID_COLUMN_LABEL;
     private final String TEXT_COLUMN_LABEL;
     private final String ROOMID_COLUMN_LABEL;
-    private final UserRowMapper AUTHOR_MAPPER;
+    private final String AUTHORID_COLUMN_LABEL;
+    private final String AUTHORNAME_COLUMN_LABEL;
 
 
-    public MessageRowMapper(String idCol, String textCol, String roomCol, UserRowMapper authorMapper) {
+    public MessageRowMapper(String idCol, String textCol, String roomCol, String authorIdCol, String authorNameCol) {
         ID_COLUMN_LABEL = idCol;
         TEXT_COLUMN_LABEL = textCol;
         ROOMID_COLUMN_LABEL = roomCol;
-        AUTHOR_MAPPER = authorMapper;
+        AUTHORID_COLUMN_LABEL = authorIdCol;
+        AUTHORNAME_COLUMN_LABEL = authorNameCol;
     }
 
 
     @Override
     public Message mapRow(ResultSet rs, int rowNum) throws SQLException {
-        User author = AUTHOR_MAPPER.mapRow(rs, rowNum);
+        long author_id = rs.getLong(AUTHORID_COLUMN_LABEL);
+        String author_name = rs.getString(AUTHORNAME_COLUMN_LABEL);
         long id = rs.getLong(ID_COLUMN_LABEL);
         String text = rs.getString(TEXT_COLUMN_LABEL);
         long roomId = rs.getLong(ROOMID_COLUMN_LABEL);
-        return new Message(id, text, author, roomId);
+        return new Message(id, text, new User(author_id, author_name, null), roomId);
     }
 }
