@@ -93,12 +93,21 @@ public class TemplateMessageRepoTest {
     }
 
     @ParameterizedTest(name = "Test finiding messages in roomID {0} | fail")
-    @ValueSource(longs = {0, 4})
+    @ValueSource(longs = {0, 4, 100, -2, 34})
     public void findInRoomTestFail(long roomId) {
         TemplateMessageRepository testSubject = new TemplateMessageRepository(EmbeddedDBProvider.get());
         List<Message> found = testSubject.getAllInRoom(roomId);
         assertNotNull(found);
         assertEquals(0, found.size());
+    }
+
+    @ParameterizedTest(name = "Test finiding messageID {0}")
+    @ValueSource(longs = {0, 1, 2, 3, 4, 5, 6, 7, 100, -2, 34})
+    public void findLimitTest(long id) {
+        TemplateMessageRepository testSubject = new TemplateMessageRepository(EmbeddedDBProvider.get());
+        List<Message> found = testSubject.getLastInRoom(id, 30);
+        assertNotNull(found);
+        assertTrue(30 >= found.size());
     }
 
     @ParameterizedTest(name = "Test inserting {0} | success")

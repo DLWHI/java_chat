@@ -26,7 +26,7 @@ public class TemplateMessageRepository implements MessageRepository {
     private final String FIND_QUERY_ROOM =
         "select " + COLUMN_SELECT + " from messages " +
         "join users on users.id = messages.author " +
-        "where room = :roomId;";
+        "where room = :roomId";
     private final String INSERT_QUERY =
         "insert into messages(text, author, room) " +
         "values(:text, :authorId, :roomId);";
@@ -116,8 +116,19 @@ public class TemplateMessageRepository implements MessageRepository {
     public List<Message> getAllInRoom(long roomId) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.query(
-            FIND_QUERY_ROOM,
+            FIND_QUERY_ROOM + ';',
             new MapSqlParameterSource("roomId", roomId),
+            mapper
+        );
+    }
+
+    @Override
+    public List<Message> getLastInRoom(long roomId, int count) {
+        NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
+        return query.query(
+            FIND_QUERY_ROOM + " limit :limit;",
+            new MapSqlParameterSource("roomId", roomId)
+                .addValue("limit", count),
             mapper
         );
     }

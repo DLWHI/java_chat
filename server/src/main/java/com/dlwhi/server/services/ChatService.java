@@ -5,23 +5,36 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.dlwhi.server.models.Message;
 import com.dlwhi.server.models.Room;
 import com.dlwhi.server.models.User;
+import com.dlwhi.server.repositories.MessageRepository;
 import com.dlwhi.server.repositories.RoomRepository;
 import com.dlwhi.server.repositories.UserRepository;
 
-public class ChatService implements UserService, RoomService {
+public class ChatService implements UserService, RoomService, MessageService {
     private final UserRepository userRepo;
     private final RoomRepository roomRepo;
+    private final MessageRepository msgRepo;
     private final PasswordEncoder encoder;
 
-    public ChatService(UserRepository userRepo, RoomRepository roomRepo) {
-        this(userRepo, roomRepo, new BCryptPasswordEncoder());
+    public ChatService(
+        UserRepository userRepo,
+        RoomRepository roomRepo,
+        MessageRepository msgRepo
+    ) {
+        this(userRepo, roomRepo, msgRepo, new BCryptPasswordEncoder());
     }
 
-    public ChatService(UserRepository userRepo, RoomRepository roomRepo, PasswordEncoder encoder) {
+    public ChatService(
+        UserRepository userRepo, 
+        RoomRepository roomRepo, 
+        MessageRepository msgRepo, 
+        PasswordEncoder encoder
+    ) {
         this.userRepo = userRepo;
-        this.roomRepo = roomRepo; 
+        this.roomRepo = roomRepo;
+        this.msgRepo = msgRepo; 
         this.encoder = encoder;
     }
 
@@ -38,14 +51,30 @@ public class ChatService implements UserService, RoomService {
     public boolean register(String username, String password) {
         return userRepo.save(new User(null, username, encoder.encode(password)));
     }
+    
+    @Override
+    public void createRoom(String name, Long owner) {
+        roomRepo.save(new Room(null, name, owner));
+    }
 
     @Override
-    public Room find(long id) {
+    public Room findRoom(long id) {
         return roomRepo.findById(id);
     }
 
     @Override
-    public List<Room> find(String roomName) {
+    public List<Room> findRoom(String roomName) {
         return roomRepo.findByName(roomName);
+    }
+
+    @Override
+    public void createMessage(String text, long roomId, User author) {
+        msgRepo.save(new Message(null, text, author, roomId));
+
+    }
+
+    @Override
+    public List<Message> lastInRoom(int count, long roomId) {
+        return msgRepo.getLastInRoom(roomId, count);
     }
 }

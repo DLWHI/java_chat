@@ -1,5 +1,6 @@
 package com.dlwhi.server.application;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -60,5 +61,20 @@ public class ServerApplication implements ClientObserver {
     @Override
     public void notifyDisconnect(Client who) {
         clients.remove(who);
+    }
+
+    @Override
+    public void notifySend(String message, String author, long room) {
+        for (Client client : clients) {
+            try {
+                if (client.isInRoom(room)) {
+                    client.receiveMessage(message, author);
+                }
+            } catch (IOException e) {
+                System.err.println("Unexpected IO exception");
+                System.err.println(e.getMessage());
+                client.terminate();
+            }
+        }
     }
 }
