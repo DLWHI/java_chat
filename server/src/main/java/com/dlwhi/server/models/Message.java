@@ -1,16 +1,26 @@
 package com.dlwhi.server.models;
 
 public class Message {
-    private int id;
+    private Long id;
     private String text;
     private User author;
-    private Room room;
+    private Long roomId;
 
-    public int getId() {
+    public Message() {
+    }
+
+    public Message(Long id, String text, User author, Long roomId) {
+        this.id = id;
+        this.text = text;
+        this.author = author;
+        this.roomId = roomId;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -30,11 +40,11 @@ public class Message {
         this.author = author;
     }
 
-    public Room getRoom() {
-        return room;
+    public Long getRoomId() {
+        return roomId;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setRoomId(long room) {
+        this.roomId = room;
     }
 }

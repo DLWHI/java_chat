@@ -6,17 +6,17 @@ import javax.sql.DataSource;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.dlwhi.server.models.User;
+import com.dlwhi.server.models.UserRowMapper;
 
 public class TemplateUserRepository implements UserRepository {
     private final String COLUMN_SELECT = 
-        "id as users.id, " + 
-        "username as users.username, " + 
-        "password as users.password";
+        "id as user_id, " + 
+        "username as user_name, " + 
+        "password as user_passwd";
 
     private final String FIND_QUERY_ID =
         "select " + COLUMN_SELECT + " from users where id = :id;";
@@ -33,6 +33,8 @@ public class TemplateUserRepository implements UserRepository {
         "select " + COLUMN_SELECT + " from users;";
 
     private final DataSource db;
+    private final UserRowMapper mapper = 
+        new UserRowMapper("user_id", "user_name", "user_passwd"); 
 
     public TemplateUserRepository(DataSource db) {
         this.db = db;
@@ -44,7 +46,7 @@ public class TemplateUserRepository implements UserRepository {
         List<User> found = query.query(
             FIND_QUERY_ID,
             new MapSqlParameterSource("id", id),
-            new BeanPropertyRowMapper<User>(User.class)
+            mapper
         );
         return (found.isEmpty()) ? null : found.get(0);
     }
@@ -54,7 +56,7 @@ public class TemplateUserRepository implements UserRepository {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.query(
             GET_ALL_QUERY,
-            new BeanPropertyRowMapper<User>(User.class)
+            mapper
         );
     }
 
@@ -95,7 +97,7 @@ public class TemplateUserRepository implements UserRepository {
         List<User> found = query.query(
             FIND_QUERY_USERNAME,
             new MapSqlParameterSource("user", username),
-            new BeanPropertyRowMapper<User>(User.class)
+            mapper
         );
         return (found.isEmpty()) ? null : found.get(0);
     }

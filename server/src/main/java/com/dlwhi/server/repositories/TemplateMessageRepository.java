@@ -4,70 +4,74 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import com.dlwhi.server.models.Room;
-import com.dlwhi.server.models.RoomRowMapper;
+import com.dlwhi.server.models.Message;
 
-public class TemplateRoomRepository implements RoomRepository {
+public class TemplateMessageRepository implements MessageRepository {
     private final String COLUMN_SELECT = 
-        "id as room_id, " + 
-        "name as room_name, " + 
-        "owner as room_ownerId";
+        "id as message_id, " + 
+        "text as message_text, " + 
+        "author as message_author_id, " +
+        "room as message_room_id";
 
     private final String FIND_QUERY_ID =
-        "select " + COLUMN_SELECT + " from rooms where id = :id;";
-    private final String FIND_QUERY_USERNAME =
-        "select " + COLUMN_SELECT + " from rooms where name = :name;";
+        "select " + COLUMN_SELECT + " from messages " +
+        "join users on users.id = messages.author " +
+        "where id = :id;";
+    private final String FIND_QUERY_ROOM =
+        "select " + COLUMN_SELECT + " from messages " +
+        "join users on users.id = messages.author " +
+        "where room = :roomId;";
     private final String INSERT_QUERY =
-        "insert into rooms(name, owner) " +
-        "values(:name, :ownerId);";
+        "insert into messages(text, author, room) " +
+        "values(:text, :authorId, :roomId);";
     private final String UPDATE_QUERY = 
-        "update rooms set name = :name, owner = :ownerId where id = :id;";
+        "update messages set text = :text where id = :id;";
     private final String DELETE_QUERY =
-        "delete from rooms where id = :id;";
+        "delete from messages where id = :id;";
     private final String GET_ALL_QUERY =
-        "select " + COLUMN_SELECT + " from rooms;";
+        "select " + COLUMN_SELECT + " from messages " +
+        "join users on users.id = messages.author;";
 
     private final DataSource db;
-    private final RoomRowMapper mapper = 
-        new RoomRowMapper("room_id", "room_name", "room_ownerId");
 
-    public TemplateRoomRepository(DataSource db) {
+    public TemplateMessageRepository(DataSource db) {
         this.db = db;
     }
 
     @Override
-    public Room findById(long id) {
+    public Message findById(long id) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
-        List<Room> found = query.query(
+        List<Message> found = query.query(
             FIND_QUERY_ID,
             new MapSqlParameterSource("id", id),
-            mapper
+            new BeanPropertyRowMapper<Message>(Message.class)
         );
         return (found.isEmpty()) ? null : found.get(0);
     }
 
     @Override
-    public List<Room> getAll() {
+    public List<Message> getAll() {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.query(
             GET_ALL_QUERY,
-            mapper
+            new BeanPropertyRowMapper<Message>(Message.class)
         );
     }
 
     @Override
-    public boolean save(Room entity) {
+    public boolean save(Message entity) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         try {
             return query.update(
                 INSERT_QUERY,
-                new MapSqlParameterSource("name", entity.getName())
-                    .addValue("ownerId", entity.getOwnerId())
+                new MapSqlParameterSource("text", entity.getText())
+                    .addValue("authorId", entity.getAuthor().getId())
+                    .addValue("roomId", entity.getRoomId())
             ) == 1;
         } catch (DataIntegrityViolationException e) {
             return false;
@@ -75,13 +79,12 @@ public class TemplateRoomRepository implements RoomRepository {
     }
 
     @Override
-    public boolean update(Room entity) {
+    public boolean update(Message entity) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.update(
             UPDATE_QUERY, 
             new MapSqlParameterSource("id", entity.getId())
-                .addValue("name", entity.getName())
-                .addValue("ownerId", entity.getOwnerId())
+                .addValue("text", entity.getText())
         ) == 1;
     }
 
@@ -92,12 +95,13 @@ public class TemplateRoomRepository implements RoomRepository {
     }
 
     @Override
-    public List<Room> findByName(String name) throws DataAccessException {
+    public List<Message> getAllInRoom(long roomId) {
         NamedParameterJdbcTemplate query = new NamedParameterJdbcTemplate(db);
         return query.query(
-            FIND_QUERY_USERNAME,
-            new MapSqlParameterSource("name", name),
-            mapper
+            FIND_QUERY_ROOM,
+            new MapSqlParameterSource("roomId", roomId),
+            new BeanPropertyRowMapper<Message>(Message.class)
         );
     }
+    
 }
