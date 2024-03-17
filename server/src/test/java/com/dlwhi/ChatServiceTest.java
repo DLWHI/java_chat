@@ -1,12 +1,14 @@
 package com.dlwhi;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -125,7 +127,7 @@ public class ChatServiceTest {
     public void createRoomNonExistentOwnerFail() {
         ChatService testSubject = new ChatService(userRepo, roomRepo, msgRepo);
         assertDoesNotThrow(() -> testSubject.createRoom("null", -1l));
-        Room room = testSubject.findRoom("null").get(0);
-        assertNull(room);
+        List<Room> room = testSubject.findRoom("null");
+        assertEquals(0, room.size());
     }
 }
