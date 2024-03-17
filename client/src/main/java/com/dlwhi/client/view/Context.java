@@ -1,11 +1,9 @@
 package com.dlwhi.client.view;
 
-import com.dlwhi.Call;
-
 public interface Context {
     void show();
-    String dispatchInput();
+    String requestCommand() throws InvalidCommandException;
+    String requestInput(String message);
 
-    void subscribe(String event, Call handler);
     void notifyRecieve(String message);
 }

@@ -1,4 +1,4 @@
-package com.dlwhi.client.exceptions;
+package com.dlwhi.client.view;
 
 public class InvalidCommandException extends RuntimeException {
     public InvalidCommandException(String message) {

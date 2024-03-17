@@ -7,7 +7,7 @@ import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
-import com.dlwhi.client.app.App;
+import com.dlwhi.client.application.ClientApplication;
 import com.dlwhi.client.exceptions.BadBindException;
 import com.dlwhi.client.exceptions.NoSuchEventException;
 import com.dlwhi.Command;
@@ -22,7 +22,7 @@ public class BindConfig {
     @Autowired
     private Map<String, Menu> menus;
 
-    public void inject(App app) {
+    public void inject(ClientApplication app) {
         bindCalls(menus, app);
         bindMenus();
         for (Map.Entry<String, Menu> menu : menus.entrySet()) {
@@ -49,7 +49,7 @@ public class BindConfig {
         }
     }
 
-    private void bindCalls(Map<String, Menu> menus, App app) {
+    private void bindCalls(Map<String, Menu> menus, ClientApplication app) {
         for (Method method : app.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Command.class)) {
                 Call call = new Call(app, method);
@@ -68,14 +68,14 @@ public class BindConfig {
         for (String context : contexts) {
             Context ctx = menus.get(context);
             if (ctx != null) {
-                ctx.subscribe(event, handler);
+                // ctx.subscribe(event, handler);
             }
         }
     }
 
     private void bindToAll(String event, Call handler) {
         for (Context ctx : menus.values()) {
-            ctx.subscribe(event, handler);
+            // ctx.subscribe(event, handler);
         }
     }
 }
