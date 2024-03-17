@@ -21,7 +21,6 @@ public class MenuCfgParser {
                 skip();
             }
         }
-        reader.reset();
     }
 
     private void parseInnerBlock(Menu ctx) throws IOException {
@@ -36,7 +35,8 @@ public class MenuCfgParser {
                 bind += token.charAt(i) - '0';
             }
             expect(token.charAt(i) != ']', "Expected index in square braces");
-            ctx.addLine(bind, readLine());
+            ctx.addLine(bind, readUntil(':'));
+            ctx.addCommand(bind, readUntil('\n'));
         }
     }
 
@@ -50,14 +50,14 @@ public class MenuCfgParser {
         return tkn;
     }
 
-    private String readLine() throws IOException {
+    private String readUntil(char stop) throws IOException {
         String tkn = "";
         int next;
         for (; Character.isWhitespace(next = reader.read()););
         if (next < 0) {
             return tkn;
         }
-        for (; next != -1 && next != '\n'; next = reader.read()) {
+        for (; next != -1 && next != stop; next = reader.read()) {
             tkn += (char) next;
         }
         return tkn;

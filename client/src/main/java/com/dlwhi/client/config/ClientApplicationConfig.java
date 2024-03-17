@@ -3,7 +3,6 @@ package com.dlwhi.client.config;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -25,28 +24,38 @@ public class ClientApplicationConfig {
     @Qualifier("contexts")
     public HashMap<String, Context> contexts() {
         HashMap<String, Context> contexts = new HashMap<>();
-        contexts.put("login", login());
-        contexts.put("main", main());
+        try {
+            contexts.put("login", login());
+            contexts.put("main", main());
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
         return contexts;
     }
 
     @Bean
     @Qualifier("loginMenu")
-    public Menu login() {
-        Menu loginMenu = new Menu(System.out, new Scanner(System.in));
-        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream(CFG_FILEPATH))) {
-            MenuCfgParser parser = new MenuCfgParser(reader);
-            parser.parseContext("login", loginMenu);
-        } catch (IOException e) {
-            // TODO: handle exception
+    public Menu login() throws IOException {
+        Menu loginMenu = new Menu(System.console());
+        try (InputStreamReader cfgReader =
+                new InputStreamReader(getClass().getResourceAsStream(CFG_FILEPATH));
+        ) {
+            MenuCfgParser cfgParser = new MenuCfgParser(cfgReader);
+            cfgParser.parseContext("login", loginMenu);
         }
         return loginMenu;
     }
 
     @Bean
     @Qualifier("mainMenu")
-    public Menu main() {
-        Menu mainMenu = new Menu(System.out, new Scanner(System.in));
+    public Menu main() throws IOException {
+        Menu mainMenu = new Menu(System.console());
+        try (InputStreamReader cfgReader =
+                new InputStreamReader(getClass().getResourceAsStream(CFG_FILEPATH));
+        ) {
+            MenuCfgParser cfgParser = new MenuCfgParser(cfgReader);
+            cfgParser.parseContext("main", mainMenu);
+        }
         return mainMenu;
     }
 }

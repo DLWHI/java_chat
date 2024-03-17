@@ -1,65 +1,61 @@
 package com.dlwhi.client.view;
 
-import java.io.PrintStream;
+import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class Menu implements Context {
-    private final PrintStream out;
-    private final Scanner in;
+    private static final String LINE = "---------------------%n";
+
+    private final Console io;
 
     private HashMap<Integer, String> lines = new HashMap<>();
-    private HashMap<String, String> commands = new HashMap<>();
+    private HashMap<Integer, String> commands = new HashMap<>();
 
-    public Menu(PrintStream out, Scanner in) {
-        this.out = out;
-        this.in = in;
+    public Menu(Console console) {
+        io = console;
     }
 
     @Override
     public void show() {
         for (Map.Entry<Integer, String> line : lines.entrySet()) {
-            out.println("[" + line.getKey() + "] " + line.getValue());
+            io.printf("[%d] %s%n", line.getKey(), line.getValue());
         }
-        out.println("---------------------");
+        io.printf(LINE);
     }
 
     @Override
     public String requestCommand() throws InvalidCommandException {
-        out.printf("-> ");
-        String input = in.nextLine();
-        String command = commands.get(input.toLowerCase());
+        io.printf("-> ");
+        String input = io.readLine();
+        String command = commands.get(Integer.valueOf(input));
         if (command == null) {
             throw new InvalidCommandException("Unkown command " + input);
         }
-        out.println("---------------------");
+        io.printf(LINE);
         return command;
     }
 
     @Override
     public String requestInput(String message) {
         System.out.println(message);
-        out.printf("-> ");
-        String input = in.nextLine();
-        out.println("---------------------");
+        io.printf("-> ");
+        String input = io.readLine();
+        io.printf(LINE);
         return input;
     }
 
 
     @Override
     public void notifyRecieve(String message) {
-        out.println(message);
+        io.printf(message + "%n");
     }
 
     public void addLine(int index, String text) {
-        if (text == null || index < 0) {
-            // throw ?
-        }
         lines.put(index, text);
     }
 
-    public void addCommand(String command, String alias) {
-        commands.put(alias.toLowerCase(), command);
+    public void addCommand(int bind, String command) {
+        commands.put(bind, command);
     }
 }
