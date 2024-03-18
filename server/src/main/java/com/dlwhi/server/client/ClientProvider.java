@@ -30,7 +30,7 @@ public class ClientProvider {
 
     public Client getClient(Socket connection) {
         try {
-            Client cl = new Client(new ClientConnection(connection), userService, roomService, msgService);
+            ClientImpl cl = new ClientImpl(new SocketConnection(connection), userService, roomService, msgService);
             cl.start();
             return cl;
         } catch (IOException e) {

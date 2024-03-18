@@ -37,8 +37,8 @@ public class ServerApplication implements ClientObserver {
         Thread shutdownListener = new Thread(() -> {
             System.out.println("Closing all clients...");
             for (Client client : clients) {
-                client.detachObserver();
-                client.terminate();
+                client.detachObserver(this);
+                client.end();
             }
         });
 
@@ -73,7 +73,7 @@ public class ServerApplication implements ClientObserver {
             } catch (IOException e) {
                 System.err.println("Unexpected IO exception");
                 System.err.println(e.getMessage());
-                client.terminate();
+                client.end();
             }
         }
     }

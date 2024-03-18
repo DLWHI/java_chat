@@ -8,12 +8,12 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 import com.dlwhi.JSONObject;
-public class ClientConnection implements Connection {
+public class SocketConnection implements Connection {
     private final Socket connection;
     private final BufferedReader in;
     private final BufferedWriter out;
 
-    public ClientConnection(Socket connection) throws IOException {
+    public SocketConnection(Socket connection) throws IOException {
         this.connection = connection;
         in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));

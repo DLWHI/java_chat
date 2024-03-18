@@ -4,10 +4,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import com.dlwhi.server.config.ServerApplicationConfig;
 
-public class MainServer 
-{
-    public static void main( String[] args )
-    {
+public class MainServer {
+    // TODO list
+    // add package standart
+    // add malformed package handling
+    // refactor client interfaces
+    public static void main( String[] args ) {
         try (AnnotationConfigApplicationContext ctx = 
                 new AnnotationConfigApplicationContext(ServerApplicationConfig.class)) {
             ctx.registerShutdownHook();
