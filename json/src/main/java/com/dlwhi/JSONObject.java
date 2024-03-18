@@ -3,7 +3,7 @@ package com.dlwhi;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JSONObject {
+public class JSONObject implements Cloneable {
     private JSONObject parent = null;
     private Map<String, Object> args = new HashMap<>();
 
