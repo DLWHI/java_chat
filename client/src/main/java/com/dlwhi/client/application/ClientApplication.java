@@ -1,6 +1,7 @@
 package com.dlwhi.client.application;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,85 +10,98 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.dlwhi.JSONObject;
-import com.dlwhi.Command;
-import com.dlwhi.client.model.Connection;
+import com.dlwhi.client.chat.Command;
+import com.dlwhi.client.chat.SocketConnection;
 import com.dlwhi.client.view.Context;
 import com.dlwhi.client.view.Menu;
 
 @Component("container")
 public class ClientApplication {
+    private final char[] PROBE_CHARSET = new char[]{0x0A, 0x0D};
+   
     @Value("${server.hostname}")
     private String hostname;
     @Value("${server.port:9857}")
     private int port;
-
-    private Connection conn;
+  
+    private SocketConnection conn;
 
     private final Map<String, Context> contexts;
     private Context currentContext;
-    
+
     private boolean exited = false;
 
     @Autowired
     ClientApplication(
-        @Qualifier("contexts") Map<String, Context> contexts
-    ) {
+            @Qualifier("contexts") Map<String, Context> contexts) {
         this.contexts = contexts;
     }
 
     public int exec() throws IOException {
         currentContext = contexts.get("login");
-        // conn = new Connection(hostname, port);
-        // currentContext.notifyRecieve(conn.probe());
-        while(!exited) {
+        conn = new SocketConnection(hostname, port);
+        probe();
+        while (!exited) {
             currentContext.show();
-            currentContext.requestCommand();
+            commandRouter(currentContext.requestCommand());
         }
         return 0;
     }
 
-    @Command("exit")
-    private void exit() {
-        exited = true;
-    }
-
-    @Command(
-        value = "sign_in",
-        context = {"login"}
-    )
-    public void signIn(String username, String password) {
-        try {
-            JSONObject toSend = 
-            new JSONObject().add("cmd", "sign_in")
-                .add("username", username)
-                .add("password", password);
-            conn.send(toSend.toString());
-            JSONObject res = conn.waitForResponse();
-            currentContext.notifyRecieve(res.getAsString("message"));
-            if (res.getAsInt("status") == 200) {
-                setActiveContext("main");
-            }
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+    private void commandRouter(Command command) throws IOException {
+        JSONObject jsonData = new JSONObject().add("cmd", command.toString());
+        switch (command) {
+            case SIGN_IN:
+                signIn(jsonData);
+                break;
+            case ENTER_ROOM:
+                break;
+            case EXIT:
+                exited = true;
+                break;
+            case FIND_ROOM:
+                break;
+            case LOG_OUT:
+                break;
+            case SIGN_UP:
+                signUp(jsonData);
+                break;
         }
     }
 
-    @Command(
-        value = "sign_up",
-        context = {"login"}
-    )
-    public void signUp(String username, String password) {
-        try {
-            JSONObject toSend = 
-            new JSONObject().add("cmd", "sign_up")
-                .add("username", username)
-                .add("password", password);
-            conn.send(toSend.toString());
-            JSONObject res = conn.waitForResponse();
-            currentContext.notifyRecieve(res.getAsString("message"));       
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+    private void probe() throws IOException {
+        conn.sendRaw(PROBE_CHARSET);
+        JSONObject res = conn.read();
+        currentContext.notifyRecieve(
+            res.getAsString("author"),
+            conn.read().getAsString("message")
+        );
+    }
+
+    private void signIn(JSONObject data) throws IOException {
+        String login = currentContext.requestInput("Login:");
+        char[] passwd = currentContext.requestSecretInput("Password:");
+        conn.send(data.add("login", login).add("passwd", passwd));
+        Arrays.fill(passwd, ' ');
+        JSONObject res = conn.read();
+        currentContext.notifyRecieve(
+            res.getAsString("author"),
+            conn.read().getAsString("message")
+        );
+        if (res.getAsInt("status") == 200) {
+            setActiveContext("main");
         }
+    }
+
+    private void signUp(JSONObject data) throws IOException {
+        String login = currentContext.requestInput("Login:");
+        char[] passwd = currentContext.requestSecretInput("Password:");
+        conn.send(data.add("login", login).add("passwd", passwd));
+        JSONObject res = conn.read();
+        currentContext.notifyRecieve(
+            res.getAsString("author"),
+            conn.read().getAsString("message")
+        );
     }
 
     public void setActiveContext(String contextName) {

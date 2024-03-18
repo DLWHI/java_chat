@@ -3,6 +3,7 @@ package com.dlwhi.client.config;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.dlwhi.client.chat.Command;
 import com.dlwhi.client.view.Menu;
 
 public class MenuCfgParser {
@@ -36,7 +37,7 @@ public class MenuCfgParser {
             }
             expect(token.charAt(i) != ']', "Expected index in square braces");
             ctx.addLine(bind, readUntil(':'));
-            ctx.addCommand(bind, readUntil('\n'));
+            ctx.addCommand(bind, Command.fromString(readUntil('\n')));
         }
     }
 

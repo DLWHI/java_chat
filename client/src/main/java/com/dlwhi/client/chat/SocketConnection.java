@@ -1,4 +1,4 @@
-package com.dlwhi.client.model;
+package com.dlwhi.client.chat;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,42 +11,34 @@ import java.net.UnknownHostException;
 
 import com.dlwhi.JSONObject;
 
-public class Connection implements Closeable {
-    private final char[] probeCharset = new char[]{0x0A, 0x0D};
-
+public class SocketConnection implements Closeable {
     private final Socket socket;
 
     private final BufferedReader in;
     private final BufferedWriter out;
 
-    private int bufferSize = 256;
-
-    public Connection(String host, int port) throws UnknownHostException, IOException {
+    public SocketConnection(String host, int port) throws UnknownHostException, IOException {
         socket = new Socket(host, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
 
-    public String probe() throws IOException {
-        out.write(probeCharset);
-        out.flush();
-        return in.readLine();
-    }
-
-    public void send(String packet) throws IOException {
-        out.write(packet + "\n");
+    public void sendRaw(char[] bytes) throws IOException {
+        out.write(bytes);
         out.flush();
     }
 
-    public JSONObject waitForResponse() throws IOException {
-        char[] buffer = new char[bufferSize];
-        String res = "";
-        int bytes;
-        do {
-            bytes = in.read(buffer);
-            res += String.valueOf(buffer);
-        } while (bytes < 0 && bytes < bufferSize);
-        return JSONObject.fromString(res);
+    public void send(JSONObject data) throws IOException {
+        out.write(data.toString() + "\n");
+        out.flush();
+    }
+
+    public JSONObject read() throws IOException {
+        String data = in.readLine();
+        if (data == null) {
+            return null;
+        }
+        return JSONObject.fromString(data);
     }
 
     @Override
@@ -63,9 +55,5 @@ public class Connection implements Closeable {
             }
             System.err.println("Connection closed");
         }
-    }
-
-    public void setBufferSize(int bufferSize) {
-        this.bufferSize = bufferSize;
     }
 }

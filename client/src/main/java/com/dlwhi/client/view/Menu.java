@@ -4,13 +4,15 @@ import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.dlwhi.client.chat.Command;
+
 public class Menu implements Context {
     private static final String LINE = "---------------------%n";
 
     private final Console io;
 
     private HashMap<Integer, String> lines = new HashMap<>();
-    private HashMap<Integer, String> commands = new HashMap<>();
+    private HashMap<Integer, Command> commands = new HashMap<>();
 
     public Menu(Console console) {
         io = console;
@@ -25,10 +27,10 @@ public class Menu implements Context {
     }
 
     @Override
-    public String requestCommand() throws InvalidCommandException {
+    public Command requestCommand() throws InvalidCommandException {
         io.printf("-> ");
         String input = io.readLine();
-        String command = commands.get(Integer.valueOf(input));
+        Command command = commands.get(Integer.valueOf(input));
         if (command == null) {
             throw new InvalidCommandException("Unkown command " + input);
         }
@@ -45,17 +47,25 @@ public class Menu implements Context {
         return input;
     }
 
+    @Override
+    public char[] requestSecretInput(String message) {
+        System.out.println(message);
+        io.printf("-> ");
+        char[] input = io.readPassword();
+        io.printf(LINE);
+        return input;
+    }
 
     @Override
-    public void notifyRecieve(String message) {
-        io.printf(message + "%n");
+    public void notifyRecieve(String sender, String message) {
+        io.printf("%s: %s%n", sender, message);
     }
 
     public void addLine(int index, String text) {
         lines.put(index, text);
     }
 
-    public void addCommand(int bind, String command) {
+    public void addCommand(int bind, Command command) {
         commands.put(bind, command);
     }
 }

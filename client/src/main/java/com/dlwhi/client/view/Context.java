@@ -1,9 +1,11 @@
 package com.dlwhi.client.view;
 
-public interface Context {
-    void show();
-    String requestCommand() throws InvalidCommandException;
-    String requestInput(String message);
+import com.dlwhi.client.chat.Command;
+import com.dlwhi.client.chat.ConnectionObserver;
 
-    void notifyRecieve(String message);
+public interface Context extends ConnectionObserver {
+    void show();
+    Command requestCommand() throws InvalidCommandException;
+    String requestInput(String message);
+    char[] requestSecretInput(String message);
 }
