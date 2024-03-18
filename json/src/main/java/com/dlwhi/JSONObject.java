@@ -53,10 +53,14 @@ public class JSONObject {
 
     public <T> T getAs(String param, Class<T> type) {
         Object target = args.get(param);
-        if (target == null && !type.isInstance(target)) {
+        if (target == null || !type.isInstance(target)) {
             return null;
         }
         return type.cast(target);
+    }
+
+    public boolean hasKey(String key) {
+        return args.containsKey(key);
     }
 
     public JSONObject getParent() {
