@@ -84,17 +84,19 @@ public class JSONLexer {
     }
 
     public static Object stripValue(String value) {
-        if (value.charAt(0) == '"') {
-            return value.substring(1, value.length() - 1);
-        } else if (Character.isDigit(value.charAt(0))) {
+        if (Character.isDigit(value.charAt(0))) {
             Double val = Double.parseDouble(value);
             double valStripped = Math.rint(val);
             if (val == valStripped) {
                 return Integer.valueOf((int)valStripped);
             }
             return val;
+        } else if ("true".equals(value)) {
+            return true;
+        } else if ("false".equals(value)) {
+            return false;
         } else {
-            return Boolean.parseBoolean(value);
+            return value;
         }
     }
 
