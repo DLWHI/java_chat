@@ -90,4 +90,11 @@ public class JSONObject implements Cloneable {
         }
         return json + "}";
     }
+    
+    @Override
+    public Object clone() {
+        JSONObject cl = new JSONObject(parent);
+        cl.args.putAll(args);
+        return cl;
+    }
 }
