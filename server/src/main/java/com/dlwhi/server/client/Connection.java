@@ -9,7 +9,6 @@ public interface Connection extends Closeable {
     boolean isClosed();
 
     JSONObject accept() throws IOException;
-    void respond(int status) throws IOException;
-    void respond(int status, JSONObject data) throws IOException;
-    void message(String message) throws IOException;
+    void send(JSONObject data) throws IOException;
+    void sendNoThrow(JSONObject data);
 }

@@ -3,7 +3,7 @@ package com.dlwhi.server.client;
 import java.io.IOException;
 
 public interface Client {
-    public void end();
+    public void disconnect();
 
     public void receiveMessage(String text, String author) throws IOException;
 

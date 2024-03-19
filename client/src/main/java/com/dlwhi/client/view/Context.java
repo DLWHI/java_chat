@@ -7,5 +7,5 @@ public interface Context extends ConnectionObserver {
     void show();
     Command requestCommand() throws InvalidCommandException;
     String requestInput(String message);
-    char[] requestSecretInput(String message);
+    StringBuilder requestSecretInput(String message);
 }

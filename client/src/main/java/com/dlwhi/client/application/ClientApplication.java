@@ -1,7 +1,6 @@
 package com.dlwhi.client.application;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +36,17 @@ public class ClientApplication {
         this.contexts = contexts;
     }
 
-    public int exec() throws IOException {
-        currentContext = contexts.get("login");
-        conn = new SocketConnection(hostname, port);
-        probe();
-        while (!exited) {
-            currentContext.show();
-            commandRouter(currentContext.requestCommand());
+    public int exec() {
+        try {
+            currentContext = contexts.get("login");
+            conn = new SocketConnection(hostname, port);
+            probe();
+            while (!exited) {
+                currentContext.show();
+                commandRouter(currentContext.requestCommand());
+            }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
         return 0;
     }
@@ -74,19 +77,21 @@ public class ClientApplication {
         JSONObject res = conn.read();
         currentContext.notifyRecieve(
             res.getAsString("author"),
-            conn.read().getAsString("message")
+            res.getAsString("message")
         );
     }
 
     private void signIn(JSONObject data) throws IOException {
         String login = currentContext.requestInput("Login:");
-        char[] passwd = currentContext.requestSecretInput("Password:");
-        conn.send(data.add("login", login).add("passwd", passwd));
-        Arrays.fill(passwd, ' ');
+        StringBuilder passwd = currentContext.requestSecretInput("Password:");
+        conn.send(data.add("login", login).add("password", passwd));
+        for (int i = 0; i < passwd.length(); ++i) {
+            passwd.setCharAt(i, ']');
+        }
         JSONObject res = conn.read();
         currentContext.notifyRecieve(
             res.getAsString("author"),
-            conn.read().getAsString("message")
+            res.getAsString("message")
         );
         if (res.getAsInt("status") == 200) {
             setActiveContext("main");
@@ -95,12 +100,15 @@ public class ClientApplication {
 
     private void signUp(JSONObject data) throws IOException {
         String login = currentContext.requestInput("Login:");
-        char[] passwd = currentContext.requestSecretInput("Password:");
-        conn.send(data.add("login", login).add("passwd", passwd));
+        StringBuilder passwd = currentContext.requestSecretInput("Password:");
+        conn.send(data.add("login", login).add("password", passwd));
+        for (int i = 0; i < passwd.length(); ++i) {
+            passwd.setCharAt(i, ']');
+        }
         JSONObject res = conn.read();
         currentContext.notifyRecieve(
             res.getAsString("author"),
-            conn.read().getAsString("message")
+            res.getAsString("message")
         );
     }
 

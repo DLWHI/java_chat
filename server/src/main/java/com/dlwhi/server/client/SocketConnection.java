@@ -20,8 +20,10 @@ public class SocketConnection implements Connection {
 
         char[] probeData = new char[2];
         in.read(probeData);
+        JSONObject res = new JSONObject().add("author", "server");
         if (probeData[0] == 0x0A && probeData[1] == 0x0D) {
-            message("Hello from server");
+            res.add("status", 200).add("message", "Hello from server");
+            write(res.toString());
         } else {
             throw new UnknownClientException(connection);
         }
@@ -38,7 +40,11 @@ public class SocketConnection implements Connection {
         if (!connection.isClosed()) {
             System.out.println("Closing client " + connection + "...");
             try {
-                message("Server is closing connection");
+                JSONObject message = new JSONObject()
+                    .add("status", 500)
+                    .add("author", "server")
+                    .add("message", "Server is closing connection");
+                write(message.toString());
             } catch (IOException e) {
             }
             out.close();
@@ -58,19 +64,18 @@ public class SocketConnection implements Connection {
     }
 
     @Override
-    public void respond(int status, JSONObject data) throws IOException {
-        write(data.add("status", status).toString());
+    public void send(JSONObject data) throws IOException {
+        write(data.toString());
     }
 
     @Override
-    public void respond(int status) throws IOException {
-        write("{\"status\":" + status + "}");
+    public void sendNoThrow(JSONObject data) {
+        try {
+            write(data.toString());
+        } catch (IOException e) {
+        }
     }
 
-    @Override
-    public void message(String message) throws IOException {
-        write("{\"message\":\"" + message + "\"}");
-    }
 
     @Override
     public boolean isClosed() {

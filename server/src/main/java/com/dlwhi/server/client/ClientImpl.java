@@ -2,6 +2,8 @@ package com.dlwhi.server.client;
 
 import java.io.IOException;
 
+import org.springframework.dao.DataAccessException;
+
 import com.dlwhi.JSONObject;
 import com.dlwhi.server.models.Room;
 import com.dlwhi.server.models.User;
@@ -33,6 +35,7 @@ public class ClientImpl extends Thread implements Client {
     public void run() {
         try {
             JSONObject source;
+            // TODO: router and fix malformed json handling
             while ((source = conn.accept()) != null && !isEnded) {
                 if (source.getAsString("cmd").equals("sign_in")) {
                     login(source);
@@ -50,31 +53,40 @@ public class ClientImpl extends Thread implements Client {
             }
             conn.close();
         } catch (IOException e) {
-            System.err.println("Unexpected IO exception");
             System.err.println(e.getMessage() + " on " + conn);
-        }
+        } catch (DataAccessException e) {
+            // JSONObject errMsg = new JSONObject()
+            //     .add("status", 500)
+            //     .add("author", "server")
+            //     .add("message", "Internal server error");
+            // conn.send(errMsg);
+        } 
         if (clientManager != null) {
             clientManager.notifyDisconnect(this);
         }
     }
 
     @Override
-    public void end() {
+    public void disconnect() {
         if (!conn.isClosed()) {
             try {
-                conn.message("Server is closing connection");
-                isEnded = true;
+                conn.close();
             } catch (IOException e) {
                 System.err.println("Unexpected IO exception occured on closing " + conn);
                 System.err.println(e.getMessage());
-            }
+            } 
         }
+        isEnded = true;
     }
 
     @Override
     public void receiveMessage(String text, String author) throws IOException {
         if (!conn.isClosed()) {
-            conn.respond(200, new JSONObject().add("text", text).add("author", author));
+            JSONObject message = new JSONObject()
+                .add("status", 200)
+                .add("author", author)
+                .add("message", text);
+            conn.send(message);
         }
     }
 
@@ -97,34 +109,56 @@ public class ClientImpl extends Thread implements Client {
     }
 
     private void register(JSONObject data) throws IOException {
-        if (users.register(data.getAsString("username"), data.getAsString("password"))) {
-            conn.respond(200);
+        JSONObject res = new JSONObject().add("author", "server");
+        String name = data.getAsString("login");
+        String passwd = data.getAsString("password");
+        if (name == null || passwd == null || name.isEmpty() || passwd.isEmpty()) {
+            res.add("status", 400).add("message", "Invalid data provided");
+        } else if (users.register(name, passwd)) {
+            res.add("status", 200).add("message", "Registration successful. Sign in to start chatting");
         } else {
-            conn.respond(401);
+            res.add("status", 400).add("message", "User exists");
         }
+        conn.send(res);
     }
 
     private void login(JSONObject data) throws IOException {
-        userData = users.login(data.getAsString("username"), data.getAsString("password"));
-        if (userData == null) {
-            conn.respond(401);
-        } else {
-            conn.respond(200);
+        JSONObject res = new JSONObject().add("author", "server");
+        String name = data.getAsString("login");
+        String passwd = data.getAsString("password"); 
+        if (name == null || passwd == null) {
+            res.add("status", 400).add("message", "Invalid data provided");
         }
+        userData = users.login(name, passwd);
+        if (userData == null) {
+            res.add("status", 403).add("message", "Invalid username or password");
+        } else {
+            res.add("status", 200).add("message", "Successful login");
+        }
+        conn.send(res);
     }
 
+    // TODO: fix complex object serialization
     private void searchRooms(JSONObject data) throws IOException {
         Room[] found = rooms.findRoom(data.getAsString("room_name")).toArray(new Room[0]);
-        conn.respond(200, new JSONObject().add("rooms", found));
+        JSONObject res = new JSONObject()
+            .add("status", 200)
+            .add("author", "server")
+            .add("message", "Found rooms:")
+            .add("rooms", found);
+        conn.send(res);
     }
 
     private void enterRoom(JSONObject data) throws IOException {
         currentRoom = rooms.findRoom(data.getAsInt("room_id"));
+        JSONObject res = new JSONObject().add("author", "server");
         if (currentRoom == null) {
-            conn.respond(200);
+            res.add("status", 404).add("message", "Room does not exist");
         } else {
-            conn.respond(404);
+            res.add("status", 200)
+                .add("message", "Entered roomId " + currentRoom.getId() + ". Last messages:");
         }
+        conn.send(res);
     }
 
     private void sendMessage(JSONObject source) throws IOException {
@@ -133,6 +167,5 @@ public class ClientImpl extends Thread implements Client {
         if (clientManager != null) {
             clientManager.notifySend(text, userData.getUsername(), currentRoom.getId());
         }
-        conn.respond(200);
     }
 }

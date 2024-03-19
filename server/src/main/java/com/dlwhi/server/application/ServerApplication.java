@@ -38,7 +38,7 @@ public class ServerApplication implements ClientObserver {
             System.out.println("Closing all clients...");
             for (Client client : clients) {
                 client.detachObserver(this);
-                client.end();
+                client.disconnect();
             }
         });
 
@@ -52,7 +52,7 @@ public class ServerApplication implements ClientObserver {
                 cl.attachObserver(this);
                 clients.add(cl);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println(e.getMessage());
         }
         return 0; 
@@ -71,9 +71,8 @@ public class ServerApplication implements ClientObserver {
                     client.receiveMessage(message, author);
                 }
             } catch (IOException e) {
-                System.err.println("Unexpected IO exception");
                 System.err.println(e.getMessage());
-                client.end();
+                client.disconnect();
             }
         }
     }

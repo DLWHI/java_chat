@@ -1,6 +1,7 @@
 package com.dlwhi.client.view;
 
 import java.io.Console;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,15 +28,23 @@ public class Menu implements Context {
     }
 
     @Override
-    public Command requestCommand() throws InvalidCommandException {
-        io.printf("-> ");
-        String input = io.readLine();
-        Command command = commands.get(Integer.valueOf(input));
-        if (command == null) {
-            throw new InvalidCommandException("Unkown command " + input);
-        }
-        io.printf(LINE);
-        return command;
+    public Command requestCommand() {
+        do {
+            io.printf("-> ");
+            String input = io.readLine();
+            try {
+                Command command = commands.get(Integer.valueOf(input));
+                if (command == null) {
+                    io.printf("Unknown command %s%n", input);
+                }
+                io.printf(LINE);
+                return command;
+            } catch (NumberFormatException e) {
+                io.printf("Unknown command %s%n", input);
+                io.printf(LINE);
+            }
+            
+        } while (true);
     }
 
     @Override
@@ -48,12 +57,14 @@ public class Menu implements Context {
     }
 
     @Override
-    public char[] requestSecretInput(String message) {
+    public StringBuilder requestSecretInput(String message) {
         System.out.println(message);
         io.printf("-> ");
         char[] input = io.readPassword();
+        StringBuilder secret = new StringBuilder().append(input);
         io.printf(LINE);
-        return input;
+        Arrays.fill(input, '[');
+        return secret;
     }
 
     @Override
