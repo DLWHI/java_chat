@@ -47,6 +47,7 @@ public class JSONParserTest {
     @ValueSource(strings = {
         "/array.json",
         "/combined.json",
+        "/empty_strings.json",
         "/nested.json",
         "/one_line.json",
         "/valid_multitype.json",

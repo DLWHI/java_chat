@@ -43,12 +43,16 @@ public class JSONObject implements Cloneable {
     }
 
     public String getAsString(String param) {
-        return args.get(param).toString()   ;
+        Object target = args.get(param);
+        if (target == null) {
+            return null;
+        }
+        return target.toString();
     }
 
     // unsafe
     public int getAsInt(String param) {
-        return (int)args.get(param);
+        return getAs(param, Integer.class);
     }
 
     public <T> T getAs(String param, Class<T> type) {

@@ -84,7 +84,7 @@ public class JSONLexer {
     }
 
     public static Object stripValue(String value) {
-        if (Character.isDigit(value.charAt(0))) {
+        if (!value.isEmpty() && Character.isDigit(value.charAt(0))) {
             Double val = Double.parseDouble(value);
             double valStripped = Math.rint(val);
             if (val == valStripped) {

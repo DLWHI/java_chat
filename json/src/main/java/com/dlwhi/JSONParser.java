@@ -3,8 +3,7 @@ package com.dlwhi;
 public class JSONParser {
     private static JSONObject current;
     private static JSONLexer lexer;
-    // TODO add array handling
-    // TODO move this to json builder
+    
     public static JSONObject parseString(String source) {
         JSONObject root = new JSONObject();
         current = root;
