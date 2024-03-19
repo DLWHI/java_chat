@@ -7,6 +7,7 @@ import com.dlwhi.server.config.ServerApplicationConfig;
 public class MainServer {
     // TODO list
     // add malformed package handling
+    // add Command enum
     // add finalizers to connections
     public static void main( String[] args ) {
         try (AnnotationConfigApplicationContext ctx = 

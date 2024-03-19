@@ -37,30 +37,12 @@ public class ClientImpl extends Thread implements Client {
             JSONObject source;
             // TODO: router and fix malformed json handling
             while ((source = conn.accept()) != null && !isEnded) {
-                if (source.getAsString("cmd").equals("sign_in")) {
-                    login(source);
-                } else if (source.getAsString("cmd").equals("sign_up")) {
-                    register(source);
-                } else if (source.getAsString("cmd").equals("search_room")) {
-                    searchRooms(source);
-                } else if (source.getAsString("cmd").equals("enter")) {
-                    enterRoom(source);
-                } else if (source.getAsString("cmd").equals("send")) {
-                    sendMessage(source);
-                } else {
-                    System.err.println("Unknown command " + source.getAsString("cmd"));
-                }
+                commandRouter(source);
             }
             conn.close();
         } catch (IOException e) {
             System.err.println(e.getMessage() + " on " + conn);
-        } catch (DataAccessException e) {
-            // JSONObject errMsg = new JSONObject()
-            //     .add("status", 500)
-            //     .add("author", "server")
-            //     .add("message", "Internal server error");
-            // conn.send(errMsg);
-        } 
+        }
         if (clientManager != null) {
             clientManager.notifyDisconnect(this);
         }
@@ -108,6 +90,42 @@ public class ClientImpl extends Thread implements Client {
         clientManager = null;
     }
 
+    private void commandRouter(JSONObject data) throws IOException {
+        try {
+            Command cmd = Command.fromString(data.getAsString("cmd"));
+            switch (cmd) {
+                case ENTER_ROOM:
+                    break;
+                case EXIT:
+                    break;
+                case FIND_ROOM:
+                    break;
+                case LOG_OUT:
+                    logout();
+                    break;
+                case SIGN_IN:
+                    login(data);
+                    break;
+                case SIGN_UP:
+                    register(data);
+                    break;
+                default:
+                    conn.send(new JSONObject()
+                        .add("status", 500)
+                        .add("author", "server")
+                        .add("message", "Unknown command")
+                    );
+                    break;
+            }
+        } catch (DataAccessException e) {
+            conn.send(new JSONObject()
+                .add("status", 500)
+                .add("author", "server")
+                .add("message", "Internal server error")
+            );
+        } 
+    }
+
     private void register(JSONObject data) throws IOException {
         JSONObject res = new JSONObject().add("author", "server");
         String name = data.getAsString("login");
@@ -135,6 +153,15 @@ public class ClientImpl extends Thread implements Client {
         } else {
             res.add("status", 200).add("message", "Successful login");
         }
+        conn.send(res);
+    }
+
+    private void logout() throws IOException {
+        userData = null;
+        JSONObject res = new JSONObject()
+            .add("status", 200)
+            .add("author", "server")
+            .add("message", "Logout successful");
         conn.send(res);
     }
 

@@ -65,6 +65,7 @@ public class ClientApplication {
             case FIND_ROOM:
                 break;
             case LOG_OUT:
+                logout(jsonData);
                 break;
             case SIGN_UP:
                 signUp(jsonData);
@@ -88,12 +89,12 @@ public class ClientApplication {
         for (int i = 0; i < passwd.length(); ++i) {
             passwd.setCharAt(i, ']');
         }
-        JSONObject res = conn.read();
+        data = conn.read();
         currentContext.notifyRecieve(
-            res.getAsString("author"),
-            res.getAsString("message")
+            data.getAsString("author"),
+            data.getAsString("message")
         );
-        if (res.getAsInt("status") == 200) {
+        if (data.getAsInt("status") == 200) {
             setActiveContext("main");
         }
     }
@@ -105,11 +106,21 @@ public class ClientApplication {
         for (int i = 0; i < passwd.length(); ++i) {
             passwd.setCharAt(i, ']');
         }
-        JSONObject res = conn.read();
+        data = conn.read();
         currentContext.notifyRecieve(
-            res.getAsString("author"),
-            res.getAsString("message")
+            data.getAsString("author"),
+            data.getAsString("message")
         );
+    }
+
+    private void logout(JSONObject data) throws IOException {
+        conn.send(data);
+        data = conn.read();
+        currentContext.notifyRecieve(
+            data.getAsString("author"),
+            data.getAsString("message")
+        );
+        setActiveContext("login");
     }
 
     public void setActiveContext(String contextName) {
