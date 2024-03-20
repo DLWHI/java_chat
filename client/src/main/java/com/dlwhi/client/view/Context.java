@@ -5,7 +5,7 @@ import com.dlwhi.client.chat.ConnectionObserver;
 
 public interface Context extends ConnectionObserver {
     void show();
-    Command requestCommand() throws InvalidCommandException;
+    Command requestCommand();
     String requestInput(String message);
     StringBuilder requestSecretInput(String message);
 }

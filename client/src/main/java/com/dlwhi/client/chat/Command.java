@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Command {
-    SIGN_IN("sign_in"),
-    SIGN_UP("sign_up"),
-    LOG_OUT("log_out"),
-    ENTER_ROOM("enter_room"),
-    FIND_ROOM("find_room"),
+    SIGN_IN("signIn"),
+    SIGN_UP("signUp"),
+    LOG_OUT("logOut"),
+    ENTER_ROOM("enterRoom"),
+    FIND_ROOM("findRoom"),
     EXIT("exit");
 
     private static Map<String, Command> values;

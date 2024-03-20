@@ -1,6 +1,7 @@
 package com.dlwhi.server.client;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 
@@ -35,7 +36,6 @@ public class ClientImpl extends Thread implements Client {
     public void run() {
         try {
             JSONObject source;
-            // TODO: router and fix malformed json handling
             while ((source = conn.accept()) != null && !isEnded) {
                 commandRouter(source);
             }
@@ -95,10 +95,7 @@ public class ClientImpl extends Thread implements Client {
             Command cmd = Command.fromString(data.getAsString("cmd"));
             switch (cmd) {
                 case ENTER_ROOM:
-                    break;
-                case EXIT:
-                    break;
-                case FIND_ROOM:
+                    enterRoom(data);
                     break;
                 case LOG_OUT:
                     logout();
@@ -110,7 +107,7 @@ public class ClientImpl extends Thread implements Client {
                     register(data);
                     break;
                 default:
-                    conn.send(new JSONObject()
+                    conn.send(data.clear()
                         .add("status", 500)
                         .add("author", "server")
                         .add("message", "Unknown command")
@@ -118,7 +115,7 @@ public class ClientImpl extends Thread implements Client {
                     break;
             }
         } catch (DataAccessException e) {
-            conn.send(new JSONObject()
+            conn.send(data.clear()
                 .add("status", 500)
                 .add("author", "server")
                 .add("message", "Internal server error")
@@ -127,33 +124,30 @@ public class ClientImpl extends Thread implements Client {
     }
 
     private void register(JSONObject data) throws IOException {
-        JSONObject res = new JSONObject().add("author", "server");
         String name = data.getAsString("login");
         String passwd = data.getAsString("password");
-        if (name == null || passwd == null || name.isEmpty() || passwd.isEmpty()) {
-            res.add("status", 400).add("message", "Invalid data provided");
+        data.clear().add("author", "server");
+        if (name.isEmpty() || passwd.isEmpty()) {
+            data.add("status", 400).add("message", "Invalid data provided");
         } else if (users.register(name, passwd)) {
-            res.add("status", 200).add("message", "Registration successful. Sign in to start chatting");
+            data.add("status", 200).add("message", "Registration successful. Sign in to start chatting");
         } else {
-            res.add("status", 400).add("message", "User exists");
+            data.add("status", 400).add("message", "User exists");
         }
-        conn.send(res);
+        conn.send(data);
     }
 
     private void login(JSONObject data) throws IOException {
-        JSONObject res = new JSONObject().add("author", "server");
         String name = data.getAsString("login");
         String passwd = data.getAsString("password"); 
-        if (name == null || passwd == null) {
-            res.add("status", 400).add("message", "Invalid data provided");
-        }
+        data.clear().add("author", "server");
         userData = users.login(name, passwd);
         if (userData == null) {
-            res.add("status", 403).add("message", "Invalid username or password");
+            data.add("status", 403).add("message", "Invalid username or password");
         } else {
-            res.add("status", 200).add("message", "Successful login");
+            data.add("status", 200).add("message", "Successful login");
         }
-        conn.send(res);
+        conn.send(data);
     }
 
     private void logout() throws IOException {
@@ -165,27 +159,27 @@ public class ClientImpl extends Thread implements Client {
         conn.send(res);
     }
 
-    // TODO: fix complex object serialization
-    private void searchRooms(JSONObject data) throws IOException {
-        Room[] found = rooms.findRoom(data.getAsString("room_name")).toArray(new Room[0]);
-        JSONObject res = new JSONObject()
-            .add("status", 200)
-            .add("author", "server")
-            .add("message", "Found rooms:")
-            .add("rooms", found);
-        conn.send(res);
-    }
-
     private void enterRoom(JSONObject data) throws IOException {
-        currentRoom = rooms.findRoom(data.getAsInt("room_id"));
-        JSONObject res = new JSONObject().add("author", "server");
-        if (currentRoom == null) {
-            res.add("status", 404).add("message", "Room does not exist");
-        } else {
-            res.add("status", 200)
-                .add("message", "Entered roomId " + currentRoom.getId() + ". Last messages:");
+        if (!data.hasKey("roomName")) {
+            return;
         }
-        conn.send(res);
+        List<Room> found = rooms.findRoom(data.getAsString("room_name"));
+        data.clear().add("author", "server");
+
+        if (found.isEmpty()) {
+            data.add("status", 404).add("message", "No rooms found");
+        } else {
+            data.add("status", 200)
+                .add("length", found.size())
+                .add("message", "Found rooms:");
+        }
+        conn.send(data);
+        for (Room room : found) {
+            data.add("roomName", room.getName()).add("roomId", room.getId());
+            conn.send(data);
+        }
+        data.clear();
+        conn.accept();
     }
 
     private void sendMessage(JSONObject source) throws IOException {

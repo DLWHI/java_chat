@@ -54,6 +54,7 @@ public class ServerApplicationConfig {
                 .setType(EmbeddedDatabaseType.HSQL)
                 .setScriptEncoding("UTF-8")
                 .addScript("/resources/schema.sql")
+                .addScript("/resources/data.sql")  // TODO: remove
                 .build();
     }
 

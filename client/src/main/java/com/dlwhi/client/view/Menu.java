@@ -29,22 +29,21 @@ public class Menu implements Context {
 
     @Override
     public Command requestCommand() {
-        do {
-            io.printf("-> ");
-            String input = io.readLine();
-            try {
-                Command command = commands.get(Integer.valueOf(input));
-                if (command == null) {
-                    io.printf("Unknown command %s%n", input);
-                }
-                io.printf(LINE);
-                return command;
-            } catch (NumberFormatException e) {
+        io.printf("-> ");
+        String input = io.readLine();
+        io.printf(LINE);
+        Command command = null;
+        try {
+            command = commands.get(Integer.valueOf(input));
+            if (command == null) {
                 io.printf("Unknown command %s%n", input);
                 io.printf(LINE);
             }
-            
-        } while (true);
+        } catch (NumberFormatException e) {
+            io.printf("Unknown command %s%n", input);
+            io.printf(LINE);
+        }
+        return command;
     }
 
     @Override
@@ -70,6 +69,14 @@ public class Menu implements Context {
     @Override
     public void notifyRecieve(String sender, String message) {
         io.printf("%s: %s%n", sender, message);
+    }
+
+    @Override
+    public void notifyRecieveList(Map<Integer, String> list) {
+        for (Map.Entry<Integer, String> line : list.entrySet()) {
+            io.printf("[%d] %s%n", line.getKey(), line.getValue());
+        }
+        io.printf(LINE);
     }
 
     public void addLine(int index, String text) {

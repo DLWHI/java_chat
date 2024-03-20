@@ -14,18 +14,14 @@
             "type": "java",
             "name": "Client",
             "request": "launch",
-            "mainClass": "com.dlwhi.client.app.MainClient",
-            "projectName": "client",
-            "args": [
-                "--hostname=localhost",
-                "--port=9999"
-            ]
+            "mainClass": "com.dlwhi.client.application.MainClient",
+            "projectName": "client"
         },
         {
             "type": "java",
             "name": "Server",
             "request": "launch",
-            "mainClass": "com.dlwhi.server.controller.MainServer",
+            "mainClass": "com.dlwhi.server.application.MainServer",
             "projectName": "server"
         }
     ],

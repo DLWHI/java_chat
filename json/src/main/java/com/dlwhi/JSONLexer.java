@@ -39,17 +39,14 @@ public class JSONLexer {
         skipSpaces();
         char cursor = source.charAt(position);
         String val;
-        if (cursor == '{' || cursor == '[') {
-            ++position;
-            return String.valueOf(cursor);
-        } else if (cursor == '"') {
+        if (cursor == '"') {
             ++position;
             val = nextString();
         } else {
             val = sliceValue();
         }
         skipSpaces();
-        if (!trySymbol(',') && "}]".indexOf(source.charAt(position)) == -1) {
+        if (!trySymbol(',') && "}".indexOf(source.charAt(position)) == -1) {
             throw new InvalidJSONException("Expected values to be comma separated [:" + position + "]");
         }
         return val;

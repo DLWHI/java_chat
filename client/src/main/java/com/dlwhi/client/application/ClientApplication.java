@@ -1,6 +1,7 @@
 package com.dlwhi.client.application;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,23 +53,25 @@ public class ClientApplication {
     }
 
     private void commandRouter(Command command) throws IOException {
-        JSONObject jsonData = new JSONObject().add("cmd", command.toString());
+        if (command == null) {
+            return;
+        }
+        JSONObject data = new JSONObject().add("cmd", command.toString());
         switch (command) {
             case SIGN_IN:
-                signIn(jsonData);
+                signIn(data);
                 break;
             case ENTER_ROOM:
+                enterRoom(data);
                 break;
             case EXIT:
                 exited = true;
                 break;
-            case FIND_ROOM:
-                break;
             case LOG_OUT:
-                logout(jsonData);
+                logout(data);
                 break;
             case SIGN_UP:
-                signUp(jsonData);
+                signUp(data);
                 break;
         }
     }
@@ -121,6 +124,26 @@ public class ClientApplication {
             data.getAsString("message")
         );
         setActiveContext("login");
+    }
+
+    private void enterRoom(JSONObject data) throws IOException {
+        String roomName = currentContext.requestInput("Enter room name:");
+        data.add("room_name", roomName);
+        conn.send(data);
+        data = conn.read();
+        currentContext.notifyRecieve(
+            data.getAsString("author"),
+            data.getAsString("message")
+        );
+        if (data.getAsInt("status") == 200) {
+            int length = data.getAsInt("length");
+            Map<Integer, String> rooms = new HashMap<>();
+            for (int i = 0; i < length; ++i) {
+                data = conn.read();
+                rooms.put(data.getAsInt("roomId"), data.getAsString("roomName"));
+            }
+            currentContext.notifyRecieveList(rooms);
+        }
     }
 
     public void setActiveContext(String contextName) {

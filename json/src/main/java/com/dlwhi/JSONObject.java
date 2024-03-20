@@ -3,7 +3,7 @@ package com.dlwhi;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JSONObject implements Cloneable {
+public class JSONObject {
     private JSONObject parent = null;
     private Map<String, Object> args = new HashMap<>();
 
@@ -50,7 +50,6 @@ public class JSONObject implements Cloneable {
         return target.toString();
     }
 
-    // unsafe
     public int getAsInt(String param) {
         return getAs(param, Integer.class);
     }
@@ -93,12 +92,5 @@ public class JSONObject implements Cloneable {
             separator = ",";
         }
         return json + "}";
-    }
-    
-    @Override
-    public JSONObject clone() {
-        JSONObject cl = new JSONObject(parent);
-        cl.args.putAll(args);
-        return cl;
     }
 }

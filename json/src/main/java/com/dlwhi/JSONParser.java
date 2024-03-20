@@ -29,14 +29,6 @@ public class JSONParser {
     private static void push() {
         String key = lexer.getKey();
         String stringValue = lexer.getValue();
-        if ("{".equals(stringValue)) {
-            JSONObject obj = new JSONObject(current);
-            current.add(key, obj);
-            current = obj;
-        } else if ("[".equals(stringValue)) {
-            current.add(key, lexer.extractArray());
-        } else {
-            current.add(key, JSONLexer.stripValue(stringValue));
-        }
+        current.add(key, JSONLexer.stripValue(stringValue));
     }
 }

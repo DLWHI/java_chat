@@ -3,7 +3,7 @@ package com.dlwhi;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class JSONPrinter {
+class JSONPrinter {
     public static String printEntry(String key, Object value) {
         String entry = '"' + key + "\":";
         if (value instanceof Object[]) {
